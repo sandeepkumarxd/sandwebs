@@ -15,7 +15,6 @@
             background-color: #0a0a0a;
             color: #e2e8f0;
         }
-        /* New Canvas Background Style */
         #interactive-bg {
             position: fixed;
             top: 0;
@@ -24,7 +23,6 @@
             height: 100%;
             z-index: -1;
         }
-        /* Custom scrollbar for a sleeker look */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -38,7 +36,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #718096;
         }
-        /* Animation classes for Intersection Observer */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
@@ -53,22 +50,55 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        /* --- New Gaming Card Styles --- */
         .game-card {
-            background: rgba(255, 255, 255, 0.05);
+            background-color: #1a1a1a;
             border-radius: 1rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform-style: preserve-3d;
         }
+
         .game-card:hover {
-            transform: translateY(-10px) scale(1.03);
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+             box-shadow: 0 40px 50px rgba(0,0,0,0.4);
         }
+
+        .game-card .card-content {
+            position: relative;
+            z-index: 2;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(10, 10, 10, 0.95) 20%, rgba(10, 10, 10, 0.7) 60%, transparent);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .game-card .card-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            z-index: 1;
+        }
+
+        .game-card:hover .card-bg {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
         .modal-backdrop {
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
         }
-        /* Custom Toast Notification */
         .toast {
             position: fixed;
             bottom: -100px;
@@ -175,53 +205,73 @@
             <h2 class="text-4xl font-bold text-center mb-12 reveal section-heading">My Gaming Life</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Valorant -->
-                <div class="game-card p-6 reveal">
-                    <img src="https://placehold.co/400x200/ff4655/ffffff?text=VALORANT" class="rounded-lg mb-4 w-full h-32 object-cover" alt="Valorant Banner">
-                    <h3 class="text-2xl font-bold">Valorant</h3>
-                    <p class="text-slate-400 mb-4">Hardstuck but having fun.</p>
-                    <div class="space-y-2 text-sm">
-                        <p class="flex justify-between"><span>Player Level:</span> <span class="font-semibold text-sky-400">250</span></p>
-                        <p class="flex justify-between"><span>Current Rank:</span> <span class="font-semibold text-yellow-500">Bronze 1</span></p>
+                <div class="game-card min-h-[400px] reveal">
+                    <div class="card-bg" style="background-image: url('https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt8693c135c5f8997a/6271c6f091f42a0e31e78465/Valorant_ep4_act3_keyart_for_web.jpg')" onerror="this.onerror=null; this.style.backgroundImage=`url(https://placehold.co/400x400/ff4655/ffffff?text=VALORANT)`"></div>
+                    <div class="card-content">
+                        <div>
+                            <h3 class="text-3xl font-bold">Valorant</h3>
+                            <p class="text-slate-300 mb-4">Hardstuck but having fun.</p>
+                        </div>
+                        <div class="mt-auto space-y-2 text-sm bg-black/30 p-3 rounded-md">
+                            <p class="flex justify-between"><span>Player Level:</span> <span class="font-semibold text-sky-400">250</span></p>
+                            <p class="flex justify-between"><span>Current Rank:</span> <span class="font-semibold text-yellow-500">Bronze 1</span></p>
+                        </div>
                     </div>
                 </div>
                 <!-- Minecraft -->
-                <div class="game-card p-6 reveal" style="transition-delay: 100ms;">
-                    <img src="https://placehold.co/400x200/6a9b43/ffffff?text=Minecraft" class="rounded-lg mb-4 w-full h-32 object-cover" alt="Minecraft Banner">
-                    <h3 class="text-2xl font-bold">Minecraft</h3>
-                    <p class="text-slate-400 mb-4">Building worlds and communities.</p>
-                    <div class="space-y-2 text-sm">
-                        <p class="flex justify-between"><span>Specialty:</span> <span class="font-semibold text-green-400">Server Developer</span></p>
-                        <p class="flex justify-between"><span>Favorite Block:</span> <span class="font-semibold text-gray-400">Stone Bricks</span></p>
+                <div class="game-card min-h-[400px] reveal" style="transition-delay: 100ms;">
+                    <div class="card-bg" style="background-image: url('https://images.igdb.com/igdb/image/upload/t_original/co1w5w.jpg')" onerror="this.onerror=null; this.style.backgroundImage=`url(https://placehold.co/400x400/6a9b43/ffffff?text=Minecraft)`"></div>
+                    <div class="card-content">
+                        <div>
+                            <h3 class="text-3xl font-bold">Minecraft</h3>
+                            <p class="text-slate-300 mb-4">Building worlds and communities.</p>
+                        </div>
+                        <div class="mt-auto space-y-2 text-sm bg-black/30 p-3 rounded-md">
+                            <p class="flex justify-between"><span>Specialty:</span> <span class="font-semibold text-green-400">Server Developer</span></p>
+                            <p class="flex justify-between"><span>Favorite Block:</span> <span class="font-semibold text-gray-400">Stone Bricks</span></p>
+                        </div>
                     </div>
                 </div>
                 <!-- Counter-Strike -->
-                <div class="game-card p-6 reveal" style="transition-delay: 200ms;">
-                    <img src="https://placehold.co/400x200/de9b35/ffffff?text=CS:GO" class="rounded-lg mb-4 w-full h-32 object-cover" alt="Counter-Strike Banner">
-                    <h3 class="text-2xl font-bold">Counter-Strike</h3>
-                    <p class="text-slate-400 mb-4">Still learning the spray patterns.</p>
-                    <div class="space-y-2 text-sm">
-                         <p class="flex justify-between"><span>Status:</span> <span class="font-semibold text-red-500">Beginner</span></p>
-                         <p class="flex justify-between"><span>Favorite Map:</span> <span class="font-semibold text-orange-400">Mirage</span></p>
+                <div class="game-card min-h-[400px] reveal" style="transition-delay: 200ms;">
+                     <div class="card-bg" style="background-image: url('https://cdn.cloudflare.steamstatic.com/steam/apps/730/capsule_616x353.jpg?t=1698860631')" onerror="this.onerror=null; this.style.backgroundImage=`url(https://placehold.co/400x400/de9b35/ffffff?text=CS:GO)`"></div>
+                     <div class="card-content">
+                        <div>
+                            <h3 class="text-3xl font-bold">Counter-Strike</h3>
+                            <p class="text-slate-300 mb-4">Still learning the spray patterns.</p>
+                        </div>
+                        <div class="mt-auto space-y-2 text-sm bg-black/30 p-3 rounded-md">
+                             <p class="flex justify-between"><span>Status:</span> <span class="font-semibold text-red-500">Beginner</span></p>
+                             <p class="flex justify-between"><span>Favorite Map:</span> <span class="font-semibold text-orange-400">Mirage</span></p>
+                        </div>
                     </div>
                 </div>
                 <!-- Rocket League -->
-                <div class="game-card p-6 reveal" style="transition-delay: 300ms;">
-                    <img src="https://placehold.co/400x200/0077c2/ffffff?text=Rocket+League" class="rounded-lg mb-4 w-full h-32 object-cover" alt="Rocket League Banner">
-                    <h3 class="text-2xl font-bold">Rocket League</h3>
-                    <p class="text-slate-400 mb-4">Calculated whiffs.</p>
-                    <div class="space-y-2 text-sm">
-                         <p class="flex justify-between"><span>Favorite Car:</span> <span class="font-semibold text-blue-400">Octane</span></p>
-                         <p class="flex justify-between"><span>Best Goal:</span> <span class="font-semibold text-purple-400">Accidental Aerial</span></p>
+                <div class="game-card min-h-[400px] reveal" style="transition-delay: 300ms;">
+                    <div class="card-bg" style="background-image: url('https://cdn1.epicgames.com/offer/9773aa1aa54f4f7b80e44db40a764f3b/EGS_RocketLeague_PsyonixLLC_S1_2560x1440-98077746723224424368146709848D4D')" onerror="this.onerror=null; this.style.backgroundImage=`url(https://placehold.co/400x400/0077c2/ffffff?text=Rocket+League)`"></div>
+                    <div class="card-content">
+                        <div>
+                            <h3 class="text-3xl font-bold">Rocket League</h3>
+                            <p class="text-slate-300 mb-4">Calculated whiffs.</p>
+                        </div>
+                        <div class="mt-auto space-y-2 text-sm bg-black/30 p-3 rounded-md">
+                             <p class="flex justify-between"><span>Favorite Car:</span> <span class="font-semibold text-blue-400">Octane</span></p>
+                             <p class="flex justify-between"><span>Best Goal:</span> <span class="font-semibold text-purple-400">Accidental Aerial</span></p>
+                        </div>
                     </div>
                 </div>
                 <!-- Clash of Clans -->
-                <div class="game-card p-6 reveal" style="transition-delay: 400ms;">
-                    <img src="https://placehold.co/400x200/f5a623/ffffff?text=Clash+of+Clans" class="rounded-lg mb-4 w-full h-32 object-cover" alt="Clash of Clans Banner">
-                    <h3 class="text-2xl font-bold">Clash of Clans</h3>
-                    <p class="text-slate-400 mb-4">Patiently waiting for upgrades.</p>
-                    <div class="space-y-2 text-sm">
-                         <p class="flex justify-between"><span>Town Hall:</span> <span class="font-semibold text-amber-500">Level 12</span></p>
-                         <p class="flex justify-between"><span>Favorite Troop:</span> <span class="font-semibold text-red-400">Hog Rider</span></p>
+                <div class="game-card min-h-[400px] reveal" style="transition-delay: 400ms;">
+                    <div class="card-bg" style="background-image: url('https://supercell.com/images/1816e813f27f0622e03943b8535a3962/og_clashofclans.jpg')" onerror="this.onerror=null; this.style.backgroundImage=`url(https://placehold.co/400x400/f5a623/ffffff?text=Clash+of+Clans)`"></div>
+                    <div class="card-content">
+                        <div>
+                            <h3 class="text-3xl font-bold">Clash of Clans</h3>
+                            <p class="text-slate-300 mb-4">Patiently waiting for upgrades.</p>
+                        </div>
+                        <div class="mt-auto space-y-2 text-sm bg-black/30 p-3 rounded-md">
+                             <p class="flex justify-between"><span>Town Hall:</span> <span class="font-semibold text-amber-500">Level 12</span></p>
+                             <p class="flex justify-between"><span>Favorite Troop:</span> <span class="font-semibold text-red-400">Hog Rider</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -321,7 +371,7 @@
         const mouse = {
             x: null,
             y: null,
-            radius: (canvas.height / 120) * (canvas.width / 120)
+            radius: (canvas.height / 100) * (canvas.width / 100)
         }
 
         window.addEventListener('mousemove', (event) => {
@@ -341,16 +391,32 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                ctx.fillStyle = 'rgba(129, 140, 248, 0.5)'; // Indigo-400 with opacity
+                ctx.fillStyle = 'rgba(129, 140, 248, 0.5)';
                 ctx.fill();
             }
             update() {
-                if (this.x > canvas.width || this.x < 0) {
-                    this.directionX = -this.directionX;
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                
+                // --- Mouse Interaction ---
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < mouse.radius + this.size) {
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 2;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 2;
+                    }
+                     if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 2;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 2;
+                    }
                 }
-                if (this.y > canvas.height || this.y < 0) {
-                    this.directionY = -this.directionY;
-                }
+                
                 this.x += this.directionX;
                 this.y += this.directionY;
                 this.draw();
@@ -367,7 +433,6 @@
                 let directionX = (Math.random() * 0.4) - 0.2;
                 let directionY = (Math.random() * 0.4) - 0.2;
                 let color = '#818cf8';
-
                 particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
             }
         }
@@ -379,7 +444,7 @@
                     let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
                     if (distance < (canvas.width/7) * (canvas.height/7)) {
                         opacityValue = 1 - (distance/20000);
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${opacityValue})`; // Sky-400
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${opacityValue})`;
                         ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
@@ -403,7 +468,7 @@
         window.addEventListener('resize', () => {
             canvas.width = innerWidth;
             canvas.height = innerHeight;
-            mouse.radius = (canvas.height / 120) * (canvas.width / 120);
+            mouse.radius = (canvas.height / 100) * (canvas.width / 100);
             init();
         });
 
@@ -429,6 +494,24 @@
 
         revealElements.forEach(el => observer.observe(el));
 
+        // --- Game Card 3D Tilt Effect ---
+        const gameCards = document.querySelectorAll('.game-card');
+        gameCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const { width, height } = rect;
+                const rotateX = (y / height - 0.5) * -10; // Max rotation 5 degrees
+                const rotateY = (x / width - 0.5) * 10;   // Max rotation 5 degrees
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+        });
+
 
         // --- Toast Notification Logic ---
         function showToast(message) {
@@ -440,16 +523,15 @@
 
             setTimeout(() => {
                 toast.classList.add('show');
-            }, 10); // small delay to allow CSS transition
+            }, 10);
 
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => {
                     container.removeChild(toast);
-                }, 500); // wait for fade out animation
-            }, 3000); // show for 3 seconds
+                }, 500);
+            }, 3000);
         }
-
 
         // --- Modal Logic ---
         const privateModeBtn = document.getElementById('private-mode-btn');
@@ -491,8 +573,6 @@
             const password = document.getElementById('password').value;
 
             if (username === 'just' && password === 'fire') {
-                // On successful login, show toast and close modal.
-                // window.location.href = "/your-private-page"; // This is where you would redirect
                 showToast('Login Successful! Redirecting...');
                 closeModal();
             } else {
@@ -521,3 +601,5 @@
     </script>
 </body>
 </html>
+
+
