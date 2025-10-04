@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Watch Time History</title>
+    <style>
+        /* ------------------- */
+        /* --- GLOBAL STYLES --- */
+        /* ------------------- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --color-bg-start: #0d021a;
+            --color-bg-mid: #1a0433;
+            --color-bg-end: #0a1122;
+            --color-card: rgba(26, 26, 38, 0.7);
+            --color-card-border: rgba(255, 255, 255, 0.1);
+            --color-text: #f0f0f0;
+            --color-text-muted: #a0a0b0;
+            --color-primary-start: #8e2de2;
+            --color-primary-end: #4a00e0;
+            --color-glow: rgba(142, 45, 226, 0.6);
+            --shadow-color: rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--color-text);
+            background: linear-gradient(-45deg, var(--color-bg-start), var(--color-bg-mid), var(--color-bg-end), var(--color-bg-mid));
+            background-size: 400% 400%;
+            animation: gradient-animation 20s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ------------------- */
+        /* --- HEADER & TOTAL --- */
+        /* ------------------- */
+        .header {
+            text-align: center;
+            padding: 80px 20px 60px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-card-border);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--color-primary-start), #4fe7f9, var(--color-primary-end));
+            background-size: 200% auto;
+            color: #fff;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: text-shine 5s linear infinite;
+        }
+        
+        @keyframes text-shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--color-text-muted);
+            margin-bottom: 30px;
+        }
+
+        #total-watchtime {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: var(--color-card);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px var(--shadow-color);
+            border: 1px solid var(--color-card-border);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .time-unit span {
+            display: block;
+            text-align: center;
+        }
+
+        .time-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px var(--color-glow);
+            line-height: 1;
+        }
+
+        .time-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* ------------------- */
+        /* --- SERIES GRID --- */
+        /* ------------------- */
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+            padding: 60px 40px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        /* CARD STYLES & ANIMATION */
+        .series-card {
+            background-color: var(--color-card);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px var(--shadow-color);
+            position: relative;
+            border: 1px solid var(--color-card-border);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transform-style: preserve-3d;
+            transition: transform 0.1s linear, box-shadow 0.3s ease;
+
+            /* For scroll animation */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .series-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .series-card:hover {
+            box-shadow: 0 20px 50px var(--shadow-color), 0 0 30px var(--color-glow);
+        }
+        
+        /* SHINE EFFECT */
+        .series-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 75%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-25deg);
+            transition: left 0.75s ease;
+            z-index: 2;
+        }
+        
+        .series-card:hover::before {
+            left: 125%;
+        }
+
+        .card-poster img {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        .series-card:hover .card-poster img {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 20px;
+            transform: translateZ(20px); /* Bring content forward in 3D space */
+        }
+        
+        .card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 0 0 5px var(--color-glow);
+        }
+
+        .season-list {
+            list-style: none;
+            max-height: 150px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        /* Custom scrollbar */
+        .season-list::-webkit-scrollbar { width: 6px; }
+        .season-list::-webkit-scrollbar-track { background: transparent; }
+        .season-list::-webkit-scrollbar-thumb { background: linear-gradient(var(--color-primary-start), var(--color-primary-end)); border-radius: 3px; }
+
+        .season-list li {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-card-border);
+        }
+
+        .season-list li:last-child { border-bottom: none; }
+        .season-list .note { font-size: 0.8rem; color: var(--color-text-muted); font-style: italic; padding-top: 5px; }
+
+        .card-total {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--color-card-border);
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-total span {
+            color: #fff;
+            text-shadow: 0 0 8px var(--color-glow);
+        }
+        
+        /* ------------------- */
+        /* --- RESPONSIVENESS --- */
+        /* ------------------- */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.2rem; }
+            .series-grid { padding: 40px 20px; grid-template-columns: 1fr; }
+            .time-value { font-size: 2.5rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Watch Time History</h1>
+        <p>A cinematic journey through my favorite series.</p>
+        <div id="total-watchtime">
+            <div class="time-unit">
+                <span id="total-days" class="time-value">0</span>
+                <span class="time-label">Days</span>
+            </div>
+            <div class="time-unit">
+                <span id="total-hours" class="time-value">0</span>
+                <span class="time-label">Hours</span>
+            </div>
+            <div class="time-unit">
+                <span id="total-minutes" class="time-value">0</span>
+                <span class="time-label">Minutes</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="series-grid" id="series-grid-container">
+            </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ------------------- //
+            // ---  DATA STORE --- //
+            // ------------------- //
+            const seriesData = [
+                {
+                    title: "The Good Doctor",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/53P8oHo9cfOsgb1cLxBi4pFY0ja.jpg",
+                    seasons: [ { name: "Season 1", episodes: 18, time: "12h 54m" }, { name: "Season 2", episodes: 18, time: "12h 54m" }, { name: "Season 3", episodes: 20, time: "14h 20m" }, { name: "Season 4", episodes: 20, time: "14h 20m" }, { name: "Season 5", episodes: 18, time: "12h 54m" }, { name: "Season 6", episodes: 22, time: "15h 46m" }, { name: "Season 7", episodes: 10, time: "7h 10m" } ]
+                },
+                {
+                    title: "Lucifer",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/ekZobS8isE6mA53RAiGDG93hBxL.jpg",
+                    seasons: [ { name: "Season 1", episodes: 13, time: "10h 11m" }, { name: "Season 2", episodes: 18, time: "14h 6m" }, { name: "Season 3", episodes: 26, time: "20h 22m" }, { name: "Season 4", episodes: 10, time: "7h 50m" }, { name: "Season 5", episodes: 16, time: "12h 32m" }, { name: "Season 6", episodes: 10, time: "7h 50m" } ]
+                },
+                {
+                    title: "Better Call Saul",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/iBAtBLqCMON5CAlhLwb2A6aZbPa.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "9h 10m" }, { name: "Season 2", episodes: 10, time: "9h 10m" }, { name: "Season 3", episodes: 10, time: "9h 10m" }, { name: "Season 4", episodes: 10, time: "9h 10m" }, { name: "Season 5", episodes: 10, time: "9h 10m" }, { name: "Season 6", episodes: 13, time: "11h 55m" } ],
+                    note: "Series Concluded"
+                },
+                {
+                    title: "Breaking Bad",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+                    seasons: [ { name: "Season 1", episodes: 7, time: "5h 29m" }, { name: "Season 2", episodes: 13, time: "10h 11m" }, { name: "Season 3", episodes: 13, time: "10h 11m" }, { name: "Season 4", episodes: 13, time: "10h 11m" }, { name: "Season 5", episodes: 16, time: "12h 32m" } ]
+                },
+                {
+                    title: "Young Sheldon",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/MpdROQ5XxQqOMd8PEA6w7Bg4Bsi.jpg",
+                    seasons: [ { name: "Season 1", episodes: 22, time: "7h 20m" }, { name: "Season 2", episodes: 22, time: "7h 20m" }, { name: "Season 3", episodes: 21, time: "7h 0m" }, { name: "Season 4", episodes: 18, time: "6h 0m" }, { name: "Season 5", episodes: 22, time: "7h 20m" }, { name: "Season 6", episodes: 22, time: "7h 20m" }, { name: "Season 7", episodes: 14, time: "4h 40m" } ]
+                },
+                {
+                    title: "Money Heist",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
+                    seasons: [ { name: "Season 1", episodes: 13, time: "10h 5m" }, { name: "Season 2", episodes: 9, time: "6h 57m" }, { name: "Season 3", episodes: 8, time: "6h 12m" }, { name: "Season 4", episodes: 8, time: "6h 12m" }, { name: "Season 5", episodes: 10, time: "7h 45m" } ]
+                },
+                {
+                    title: "The Boys",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/2zmTngn1tJ9p5PaNyugybAMT_8i.jpg",
+                    seasons: [ { name: "Season 1", episodes: 8, time: "8h 24m" }, { name: "Season 2", episodes: 8, time: "8h 24m" }, { name: "Season 3", episodes: 8, time: "8h 24m" }, { name: "Season 4", episodes: 8, time: "8h 24m" } ]
+                },
+                {
+                    title: "Stranger Things",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
+                    seasons: [ { name: "Season 1", episodes: 8, time: "6h 40m" }, { name: "Season 2", episodes: 9, time: "7h 30m" }, { name: "Season 3", episodes: 8, time: "6h 40m" }, { name: "Season 4", episodes: 9, time: "12h 45m" } ]
+                },
+                {
+                    title: "Ginny & Georgia",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/A0ZeI0b201C2RdED01jcr082JOM.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "9h 10m" }, { name: "Season 2", episodes: 10, time: "9h 40m" }],
+                    note: "Season 3 not yet released"
+                },
+                {
+                    title: "You",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/s4jg0n62sMXQd2iM1ec4jH2aD2.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "8h 0m" }, { name: "Season 2", episodes: 10, time: "8h 0m" }, { name: "Season 3", episodes: 10, time: "8h 0m" }, { name: "Season 4", episodes: 10, time: "8h 0m" } ],
+                    note: "Season 5 not yet released"
+                },
+                {
+                    title: "Sex Education",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/8jtn7P39i1yFk1EshnakaD2M3f6.jpg",
+                    seasons: [ { name: "Season 1", episodes: 8, time: "7h 12m" }, { name: "Season 2", episodes: 8, time: "7h 12m" }, { name: "Season 3", episodes: 8, time: "7h 12m" }, { name: "Season 4", episodes: 8, time: "7h 12m" } ]
+                },
+                {
+                    title: "Bridgerton",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/mY36hY8NqC0t2iBLsO2fja4o4a.jpg",
+                    seasons: [ { name: "Season 1", episodes: 8, time: "8h 40m" }, { name: "Season 2", episodes: 8, time: "8h 40m" }, { name: "Season 3", episodes: 8, time: "8h 40m" } ]
+                },
+                {
+                    title: "From",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/1D5w5nB5Gg4jkeyiNnL5aGqr1r.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "8h 20m" }, { name: "Season 2", episodes: 10, time: "8h 20m" }, { name: "Season 3", episodes: 10, time: "8h 20m" } ]
+                },
+                {
+                    title: "Dark",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/apbrb6EVteKms_s2hoXrdB3Ffhi.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "9h 10m" }, { name: "Season 2", episodes: 8, time: "7h 20m" }, { name: "Season 3", episodes: 8, time: "7h 20m" } ]
+                },
+                {
+                    title: "Never Have I Ever",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/14p1aXnS5a4aT5d2Z5Y5a2hSFS.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "4h 40m" }, { name: "Season 2", episodes: 10, time: "4h 40m" }, { name: "Season 3", episodes: 10, time: "4h 40m" }, { name: "Season 4", episodes: 10, time: "4h 40m" } ]
+                },
+                {
+                    title: "Insatiable",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/o2zviJ5ItLzMxdv1v05y24AWfS.jpg",
+                    seasons: [ { name: "Season 1", episodes: 12, time: "9h 24m" }, { name: "Season 2", episodes: 10, time: "7h 50m" } ]
+                },
+                {
+                    title: "Alice In Borderland",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/20mOwAAK8jA8iLgH2fVavBnIagS.jpg",
+                    seasons: [ { name: "Season 1", episodes: 8, time: "8h 24m" }, { name: "Season 2", episodes: 8, time: "8h 24m" } ]
+                },
+                {
+                    title: "All of Us Are Dead",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pTEFqAjLd5YTsMD6NS8AyI92oV8.jpg",
+                    seasons: [ { name: "Season 1", episodes: 12, time: "13h 0m" } ]
+                },
+                {
+                    title: "Business Proposal",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/1iA21bX81m0iQv4tTpesw8fL2T.jpg",
+                    seasons: [ { name: "Season 1", episodes: 12, time: "12h 12m" } ]
+                },
+                {
+                    title: "Kota Factory",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/aBpsS3p6T1s4t1G35UjlnR04txp.jpg",
+                    seasons: [ { name: "Season 1", episodes: 5, time: "3h 30m" }, { name: "Season 2", episodes: 5, time: "3h 30m" }, { name: "Season 3", episodes: 5, time: "3h 30m" } ]
+                },
+                 {
+                    title: "Dahmer",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/f2PVrOLCvYNitWk4NBzGRs1DyQQ.jpg",
+                    seasons: [ { name: "Miniseries", episodes: 10, time: "8h 20m" } ]
+                },
+                {
+                    title: "Squid Game",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/dDlEsim36GoeccA4gE5flN2hjWl.jpg",
+                    seasons: [ { name: "Season 1", episodes: 9, time: "8h 15m" } ],
+                    note: "Season 2 not yet released"
+                },
+                {
+                    title: "Wednesday",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/9PFonBhy4cQy7Jz20NpMygczOkv.jpg",
+                    seasons: [ { name: "Season 1", episodes: 8, time: "7h 12m" } ]
+                },
+                {
+                    title: "Arcane",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg",
+                    seasons: [ { name: "Season 1", episodes: 9, time: "6h 45m" } ],
+                    note: "Season 2 not yet released"
+                },
+                {
+                    title: "So Not Worth It",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/aVuE5na2hOD2O0kAtY3p7aVCQP3.jpg",
+                    seasons: [ { name: "Season 1", episodes: 12, time: "6h 24m" } ]
+                },
+                {
+                    title: "End of the F***ing World",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/t4hYtIcz215zJNwh4s3oZc2nS2w.jpg",
+                    seasons: [ { name: "Season 1", episodes: 8, time: "2h 56m" }, { name: "Season 2", episodes: 8, time: "2h 56m" } ]
+                },
+                {
+                    title: "XO, Kitty",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/OOC3pL4Ie4S427mJ5r45D5cxOIk.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "5h 0m" } ],
+                    note: "Season 2 not yet released"
+                },
+                {
+                    title: "Georgie & Mandy's First Marriage",
+                    poster: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/z21aLp9P92sTJH7Keq2bAdqYqCa.jpg",
+                    seasons: [ { name: "Season 1", episodes: 10, time: "3h 40m" } ],
+                    note: "Based on episodes to date"
+                }
+            ];
+
+            const gridContainer = document.getElementById('series-grid-container');
+            let totalMinutes = 0;
+            
+            const parseTimeToMinutes = (timeStr) => {
+                const parts = timeStr.replace('h', '').replace('m', '').split(' ');
+                const hours = parseInt(parts[0], 10) || 0;
+                const minutes = parseInt(parts[1], 10) || 0;
+                return (hours * 60) + minutes;
+            };
+            
+            const formatMinutesToDetailedString = (totalMinutes) => {
+                if (totalMinutes === 0) return "0m";
+                const days = Math.floor(totalMinutes / (24 * 60));
+                const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+                const minutes = totalMinutes % 60;
+                
+                let result = "";
+                if (days > 0) result += `${days}d `;
+                if (hours > 0) result += `${hours}h `;
+                if (minutes > 0) result += `${minutes}m`;
+                return result.trim();
+            };
+            
+            // Generate and inject all cards
+            seriesData.sort((a,b) => a.title.localeCompare(b.title)).forEach(series => { // Sorted alphabetically
+                let seriesTotalMinutes = 0;
+                
+                const seasonsHtml = series.seasons.map(season => {
+                    seriesTotalMinutes += parseTimeToMinutes(season.time);
+                    return `<li><span>${season.name} (${season.episodes} ep)</span><span>${season.time}</span></li>`;
+                }).join('');
+
+                const noteHtml = series.note ? `<li class="note">${series.note}</li>` : '';
+                totalMinutes += seriesTotalMinutes;
+
+                const card = document.createElement('div');
+                card.className = 'series-card';
+                card.innerHTML = `
+                    <div class="card-poster"><img src="${series.poster}" alt="${series.title} Poster" loading="lazy"></div>
+                    <div class="card-content">
+                        <h3>${series.title}</h3>
+                        <ul class="season-list">${seasonsHtml}${noteHtml}</ul>
+                        <div class="card-total">Total: <span>${formatMinutesToDetailedString(seriesTotalMinutes)}</span></div>
+                    </div>`;
+                gridContainer.appendChild(card);
+            });
+
+            // Calculate final times
+            const finalDays = Math.floor(totalMinutes / (24 * 60));
+            const finalHours = Math.floor((totalMinutes % (24 * 60)) / 60);
+            const finalMinutes = totalMinutes % 60;
+
+            const animateCounter = (element, endValue, duration = 2000) => {
+                let start = 0;
+                const startTime = performance.now();
+                const update = (currentTime) => {
+                    const progress = Math.min((currentTime - startTime) / duration, 1);
+                    element.textContent = Math.floor(progress * endValue);
+                    if (progress < 1) requestAnimationFrame(update);
+                    else element.textContent = endValue;
+                };
+                requestAnimationFrame(update);
+            };
+
+            animateCounter(document.getElementById('total-days'), finalDays);
+            animateCounter(document.getElementById('total-hours'), finalHours);
+            animateCounter(document.getElementById('total-minutes'), finalMinutes);
+
+            // Scroll Animation Observer
+            const cards = document.querySelectorAll('.series-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            cards.forEach(card => observer.observe(card));
+
+            // 3D Tilt Effect
+            cards.forEach(card => {
+                const maxRotate = 15; // Max degrees of rotation
+
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const { width, height } = rect;
+
+                    const rotateX = maxRotate * ((y / height) - 0.5) * -1; // Invert for natural feel
+                    const rotateY = maxRotate * ((x / width) - 0.5);
+
+                    requestAnimationFrame(() => {
+                        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    requestAnimationFrame(() => {
+                        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
