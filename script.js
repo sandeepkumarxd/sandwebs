@@ -38,7 +38,7 @@ class Particle {
     update() {
         if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
         if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-        
+
         let dx = mouse.x - this.x;
         let dy = mouse.y - this.y;
         let distance = Math.sqrt(dx*dx + dy*dy);
@@ -48,7 +48,7 @@ class Particle {
             if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 2;
             if (mouse.y > this.y && this.y > this.size * 10) this.y -= 2;
         }
-        
+
         this.x += this.directionX;
         this.y += this.directionY;
         this.draw();
@@ -90,7 +90,7 @@ function connect() {
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0,0,innerWidth, innerHeight);
-    
+
     for (let i = 0; i < particlesArray.length; i++) {
         particlesArray[i].update();
     }
@@ -134,7 +134,7 @@ gameCards.forEach(card => {
         card.style.setProperty('--x', `${x}px`);
         card.style.setProperty('--y', `${y}px`);
         const { width, height } = rect;
-        const rotateX = (y / height - 0.5) * -15; 
+        const rotateX = (y / height - 0.5) * -15;
         const rotateY = (x / width - 0.5) * 15;
         card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
     });
@@ -150,59 +150,4 @@ function showToast(message) {
     toast.textContent = message;
     toast.className = 'toast';
     container.appendChild(toast);
-    setTimeout(() => { toast.classList.add('show'); }, 10);
-    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { container.removeChild(toast); }, 500); }, 3000);
-}
-const privateModeBtn = document.getElementById('private-mode-btn');
-const loginModal = document.getElementById('login-modal');
-const closeModalBtn = document.getElementById('close-modal-btn');
-const loginForm = document.getElementById('login-form');
-const loginFormContainer = document.getElementById('login-form-container');
-const errorMessage = document.getElementById('error-message');
-const modalBackdrop = document.querySelector('.modal-backdrop');
-
-const openModal = () => {
-    loginModal.classList.remove('hidden');
-    setTimeout(() => {
-        loginFormContainer.classList.remove('scale-95', 'opacity-0');
-        loginFormContainer.classList.add('scale-100', 'opacity-100');
-    }, 10);
-};
-const closeModal = () => {
-    loginFormContainer.classList.add('scale-95', 'opacity-0');
-    loginFormContainer.classList.remove('scale-100', 'opacity-100');
-    setTimeout(() => {
-        loginModal.classList.add('hidden');
-        errorMessage.classList.add('hidden');
-        loginForm.reset();
-    }, 300);
-};
-privateModeBtn.addEventListener('click', openModal);
-closeModalBtn.addEventListener('click', closeModal);
-modalBackdrop.addEventListener('click', closeModal);
-
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    if (username === 'just' && password === 'fire') {
-        showToast('Login Successful! Redirecting...');
-        closeModal();
-    } else {
-        errorMessage.classList.remove('hidden');
-        loginFormContainer.classList.add('animate-shake');
-        setTimeout(() => {
-          loginFormContainer.classList.remove('animate-shake');
-        }, 500)
-    }
-});
-const style = document.createElement('style');
-style.innerHTML = `
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-        20%, 40%, 60%, 80% { transform: translateX(5px); }
-    }
-    .animate-shake { animation: shake 0.5s ease-in-out; }
-`;
-document.head.appendChild(style);
+    setTimeout(() => { toast.classList.add('show'); }, 1
