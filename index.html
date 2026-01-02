@@ -5,607 +5,632 @@
     <title>Watchlog 2.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-  @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
-
-  :root {
-    color-scheme: dark;
-    --bg-main: #020617;
-    --glass: rgba(15, 23, 42, 0.78);
-    --glass-soft: rgba(15, 23, 42, 0.6);
-    --border-strong: rgba(148, 163, 184, 0.55);
-    --accent-pink: #ff5ac8;
-    --accent-cyan: #22e4ff;
-    --accent-purple: #a855ff;
-    --accent-amber: #facc15;
-    --text-main: #e5e7eb;
-    --text-dim: #9ca3af;
-    --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.9);
-    --radius-lg: 28px;
-    --radius-md: 20px;
-    --radius-pill: 999px;
-    --blur-lg: 34px;
-  }
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont,
-      "SF Pro Text", "Inter", sans-serif;
-    background: radial-gradient(circle at top, #020617 0, #000 70%);
-    color: var(--text-main);
-    overflow: hidden;
-  }
-
-  body {
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-  }
-
-  /* AURORA + GRID BACKGROUND */
-
-  .aurora-bg {
-    position: relative;
-    min-height: 100vh;
-    width: 100%;
-    padding: 24px;
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    overflow: hidden;
-    background:
-      radial-gradient(circle at 0% 0%, #0f172a 0, transparent 55%),
-      radial-gradient(circle at 100% 100%, #020617 0, transparent 60%),
-      #020617;
-  }
-      <div class="aurora-bg">
-  <div class="bg-grid"></div>
-  <div class="glass-layer">
-    ...
-  </div>
-</div>
-
-
-  .aurora-bg::before,
-  .aurora-bg::after {
-    content: "";
-    position: absolute;
-    inset: -40%;
-    background:
-      radial-gradient(circle at 10% 0%, rgba(34, 228, 255, 0.4) 0, transparent 55%),
-      radial-gradient(circle at 90% 100%, rgba(255, 90, 200, 0.35) 0, transparent 55%);
-    filter: blur(70px);
-    opacity: 0.9;
-    mix-blend-mode: screen;
-    animation: auroraShift 28s ease-in-out infinite alternate;
-    z-index: 0;
-  }
-
-  .aurora-bg::after {
-    animation-duration: 36s;
-    animation-direction: alternate-reverse;
-  }
-
-  .bg-grid {
-    position: absolute;
-    inset: 0;
-    background-image: linear-gradient(
-        rgba(30, 64, 175, 0.4) 1px,
-        transparent 1px
-      ),
-      linear-gradient(90deg, rgba(30, 64, 175, 0.4) 1px, transparent 1px);
-    background-size: 70px 70px;
-    opacity: 0.12;
-    mask-image: radial-gradient(circle at center, black 0, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .glass-layer {
-    position: relative;
-    max-width: 1360px;
-    width: 100%;
-    max-height: 96vh;
-    margin: auto;
-    background: radial-gradient(circle at top left, #111827 0, #020617 70%);
-    border-radius: 34px;
-    border: 1px solid rgba(148, 163, 184, 0.6);
-    box-shadow: var(--shadow-strong);
-    backdrop-filter: blur(var(--blur-lg)) saturate(130%);
-    padding: 24px 26px 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    overflow: hidden;
-    z-index: 1;
-  }
-
-  .glass-layer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(circle at 0 0, rgba(236, 72, 153, 0.18), transparent 55%);
-    pointer-events: none;
-  }
-
-  /* HEADER */
-
-  .app-header {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    z-index: 1;
-  }
-
-  .title-block {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .app-title {
-    margin: 0;
-    font-size: 36px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    background: conic-gradient(
-      from 210deg,
-      #f97316,
-      var(--accent-pink),
-      var(--accent-purple),
-      var(--accent-cyan),
-      #f97316
-    );
-    background-size: 320% 320%;
-    -webkit-background-clip: text;
-    color: transparent;
-    animation: titleGlow 8s ease-in-out infinite;
-    position: relative;
-  }
-
-  .app-title::after {
-    content: "";
-    position: absolute;
-    inset: 58% 0 -40%;
-    background: radial-gradient(circle at top, rgba(236, 72, 153, 0.22), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
-  }
-
-  .glass-layer:hover .app-title::after {
-    opacity: 1;
-  }
-
-  .app-subtitle {
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .stats-pill {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    border-radius: var(--radius-pill);
-    background: radial-gradient(circle at top left, #020617, #020617 55%, #000 100%);
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stats-pill::before {
-    content: "";
-    position: absolute;
-    inset: -40%;
-    background: conic-gradient(
-      from 0deg,
-      rgba(34, 228, 255, 0.6),
-      rgba(236, 72, 153, 0.6),
-      rgba(168, 85, 255, 0.5),
-      transparent 80%
-    );
-    opacity: 0;
-    transition: opacity 0.2s ease-out, transform 0.3s ease-out;
-    transform: translate3d(-12px, 10px, 0);
-    mix-blend-mode: screen;
-  }
-
-  .glass-layer:hover .stats-pill::before {
-    opacity: 0.6;
-    transform: translate3d(0, 0, 0);
-  }
-
-  .stats-item {
-    display: flex;
-    flex-direction: column;
-    min-width: 70px;
-  }
-
-  .stats-label {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--text-dim);
-  }
-
-  .stats-value {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  /* TIMER */
-
-  .timer-section {
-    border-radius: var(--radius-md);
-    background: radial-gradient(circle at top left, #1f2937 0, #020617 70%);
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    padding: 16px 18px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .timer-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 100% -10%, rgba(34, 228, 255, 0.2), transparent 60%);
-    opacity: 0.8;
-    pointer-events: none;
-  }
-
-  .timer-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 1;
-  }
-
-  .timer-mode {
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent-cyan);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .timer-mode::before {
-    content: "";
-    width: 7px;
-    height: 7px;
-    border-radius: 999px;
-    background: radial-gradient(circle at center, #22e4ff, transparent);
-    box-shadow: 0 0 12px rgba(34, 228, 255, 0.8);
-  }
-
-  .timer-value {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-shadow:
-      0 0 10px rgba(34, 211, 238, 0.6),
-      0 0 26px rgba(236, 72, 153, 0.7);
-    animation: timerWarp 2.3s ease-in-out infinite;
-  }
-
-  .timer-sub {
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-
-  .timer-progress-track {
-    position: absolute;
-    inset: auto 16px 8px 16px;
-    height: 3px;
-    border-radius: 999px;
-    background: rgba(15, 23, 42, 0.9);
-    overflow: hidden;
-  }
-
-  .timer-progress-fill {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(
-      90deg,
-      rgba(236, 72, 153, 0.9),
-      rgba(129, 140, 248, 0.9),
-      rgba(56, 189, 248, 0.9)
-    );
-    transform-origin: left;
-  }
-
-  /* GRID SECTION */
-
-  .grid-section {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    flex: 1;
-    min-height: 0;
-    position: relative;
-    z-index: 1;
-  }
-
-  .section-title {
-    margin: 0;
-    font-size: 13px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .series-grid {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
-    padding-right: 4px;
-  }
-
-  /* SERIES CARD – stronger interaction */
-
-  .series-card {
-    position: relative;
-    border-radius: 22px;
-    padding: 14px 14px 12px;
-    background: radial-gradient(circle at top left, #020617 0, #020617 55%, #000 100%);
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    color: inherit;
-    cursor: pointer;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    isolation: isolate;
-    overflow: hidden;
-    transition:
-      transform 0.16s ease-out,
-      border-color 0.16s ease-out,
-      box-shadow 0.16s ease-out,
-      background 0.2s ease-out,
-      filter 0.18s ease-out;
-    transform-style: preserve-3d;
-  }
-
-  .series-card::before {
-    content: "";
-    position: absolute;
-    inset: -40%;
-    background: conic-gradient(
-      from 180deg,
-      rgba(236, 72, 153, 0.26),
-      rgba(56, 189, 248, 0.36),
-      rgba(129, 140, 248, 0.24),
-      transparent,
-      transparent
-    );
-    opacity: 0;
-    transform: translate3d(0, 14px, 0);
-    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-    z-index: -1;
-    mix-blend-mode: screen;
-  }
-
-  .series-card:hover::before {
-    opacity: 0.9;
-    transform: translate3d(0, 0, 0);
-  }
-
-  .series-card:hover {
-    transform: translateY(-4px) scale(1.015) rotateX(3deg);
-    border-color: rgba(236, 72, 153, 0.9);
-    box-shadow:
-      0 18px 40px rgba(15, 23, 42, 0.95),
-      0 0 30px rgba(236, 72, 153, 0.55);
-    background: radial-gradient(circle at top left, #020617, #020617 55%, #020617 100%);
-    filter: saturate(1.25);
-  }
-
-  .series-card:active {
-    transform: translateY(-1px) scale(0.99);
-    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.8);
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-  }
-
-  .series-title {
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-  }
-
-  .series-tag {
-    font-size: 10px;
-    padding: 3px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(236, 72, 153, 0.9);
-    background: rgba(15, 23, 42, 0.9);
-    color: #f9a8d4;
-    box-shadow: 0 0 10px rgba(236, 72, 153, 0.7);
-  }
-
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .card-metrics {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-
-  .season-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .season-row {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-  }
-
-  .season-label {
-    color: var(--accent-cyan);
-    font-weight: 500;
-  }
-
-  .season-bar-track {
-    position: relative;
-    height: 5px;
-    border-radius: 999px;
-    background: rgba(30, 64, 175, 0.6);
-    overflow: hidden;
-  }
-
-  .season-bar-fill {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(
-      90deg,
-      rgba(236, 72, 153, 0.9),
-      rgba(129, 140, 248, 0.9),
-      rgba(56, 189, 248, 0.9)
-    );
-    transform-origin: left;
-    animation: barGlow 1.4s cubic-bezier(0.18, 0.76, 0.3, 1) backwards;
-  }
-
-  .season-meta {
-    color: var(--text-dim);
-  }
-
-  .series-grid::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .series-grid::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .series-grid::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.7);
-    border-radius: 999px;
-  }
-
-  /* ANIMATIONS */
-
-  @keyframes auroraShift {
-    0% {
-      transform: translate3d(-8%, -10%, 0) scale(1);
-    }
-    50% {
-      transform: translate3d(10%, 6%, 0) scale(1.1);
-    }
-    100% {
-      transform: translate3d(-4%, 14%, 0) scale(0.96);
-    }
-  }
-
-  @keyframes titleGlow {
-    0%,
-    100% {
-      filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.45));
-      background-position: 0% 50%;
-    }
-    50% {
-      filter: drop-shadow(0 0 28px rgba(34, 211, 238, 0.85));
-      background-position: 100% 50%;
-    }
-  }
-
-  @keyframes timerWarp {
-    0%,
-    100% {
-      transform: translateY(0) scale(1);
-      text-shadow:
-        0 0 14px rgba(34, 211, 238, 0.7),
-        0 0 30px rgba(236, 72, 153, 0.7);
-    }
-    50% {
-      transform: translateY(-1px) scale(1.02);
-      text-shadow:
-        0 0 30px rgba(34, 211, 238, 1),
-        0 0 40px rgba(236, 72, 153, 0.9);
-    }
-  }
-
-  @keyframes barGlow {
-    0% {
-      transform: scaleX(0);
-      opacity: 0.35;
-    }
-    60% {
-      opacity: 1;
-    }
-    100% {
-      transform: scaleX(1);
-      opacity: 1;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .glass-layer {
-      padding: 18px;
-      max-height: 100vh;
-      border-radius: 0;
-    }
-
-    .app-header {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .stats-pill {
-      width: 100%;
-      justify-content: space-between;
-    }
-
-    .timer-value {
-      font-size: 26px;
-    }
-  }
-</style>
-
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+      :root {
+        color-scheme: dark;
+        --bg-main: #020617;
+        --glass: rgba(15, 23, 42, 0.78);
+        --glass-soft: rgba(15, 23, 42, 0.6);
+        --border-strong: rgba(148, 163, 184, 0.55);
+        --accent-pink: #ff5ac8;
+        --accent-cyan: #22e4ff;
+        --accent-purple: #a855ff;
+        --accent-amber: #facc15;
+        --text-main: #e5e7eb;
+        --text-dim: #9ca3af;
+        --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.9);
+        --radius-lg: 28px;
+        --radius-md: 20px;
+        --radius-pill: 999px;
+        --blur-lg: 34px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        font-family: "Space Grotesk", system-ui, -apple-system,
+          BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+        background: radial-gradient(circle at top, #020617 0, #000 70%);
+        color: var(--text-main);
+        overflow: hidden;
+      }
+
+      body {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+      }
+
+      /* AURORA + GRID BACKGROUND */
+
+      .aurora-bg {
+        position: relative;
+        min-height: 100vh;
+        width: 100%;
+        padding: 24px;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        overflow: hidden;
+        background: radial-gradient(circle at 0% 0%, #0f172a 0, transparent 55%),
+          radial-gradient(circle at 100% 100%, #020617 0, transparent 60%),
+          #020617;
+      }
+
+      .aurora-bg::before,
+      .aurora-bg::after {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background: radial-gradient(
+            circle at 10% 0%,
+            rgba(34, 228, 255, 0.4) 0,
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 90% 100%,
+            rgba(255, 90, 200, 0.35) 0,
+            transparent 55%
+          );
+        filter: blur(70px);
+        opacity: 0.9;
+        mix-blend-mode: screen;
+        animation: auroraShift 28s ease-in-out infinite alternate;
+        z-index: 0;
+      }
+
+      .aurora-bg::after {
+        animation-duration: 36s;
+        animation-direction: alternate-reverse;
+      }
+
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(
+            rgba(30, 64, 175, 0.4) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(30, 64, 175, 0.4) 1px, transparent 1px);
+        background-size: 70px 70px;
+        opacity: 0.12;
+        mask-image: radial-gradient(circle at center, black 0, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .glass-layer {
+        position: relative;
+        max-width: 1360px;
+        width: 100%;
+        max-height: 96vh;
+        margin: auto;
+        background: radial-gradient(circle at top left, #111827 0, #020617 70%);
+        border-radius: 34px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        box-shadow: var(--shadow-strong);
+        backdrop-filter: blur(var(--blur-lg)) saturate(130%);
+        padding: 24px 26px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        overflow: hidden;
+        z-index: 1;
+        transition: transform 0.1s ease-out; /* Added for smoother parallax */
+      }
+
+      .glass-layer::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(236, 72, 153, 0.18),
+          transparent 55%
+        );
+        pointer-events: none;
+      }
+
+      /* HEADER */
+
+      .app-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        z-index: 1;
+      }
+
+      .title-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .app-title {
+        margin: 0;
+        font-size: 36px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        background: conic-gradient(
+          from 210deg,
+          #f97316,
+          var(--accent-pink),
+          var(--accent-purple),
+          var(--accent-cyan),
+          #f97316
+        );
+        background-size: 320% 320%;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: titleGlow 8s ease-in-out infinite;
+        position: relative;
+      }
+
+      .app-title::after {
+        content: "";
+        position: absolute;
+        inset: 58% 0 -40%;
+        background: radial-gradient(
+          circle at top,
+          rgba(236, 72, 153, 0.22),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+      }
+
+      .glass-layer:hover .app-title::after {
+        opacity: 1;
+      }
+
+      .app-subtitle {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text-dim);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .stats-pill {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-radius: var(--radius-pill);
+        background: radial-gradient(
+          circle at top left,
+          #020617,
+          #020617 55%,
+          #000 100%
+        );
+        border: 1px solid rgba(148, 163, 184, 0.55);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stats-pill::before {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background: conic-gradient(
+          from 0deg,
+          rgba(34, 228, 255, 0.6),
+          rgba(236, 72, 153, 0.6),
+          rgba(168, 85, 255, 0.5),
+          transparent 80%
+        );
+        opacity: 0;
+        transition: opacity 0.2s ease-out, transform 0.3s ease-out;
+        transform: translate3d(-12px, 10px, 0);
+        mix-blend-mode: screen;
+      }
+
+      .glass-layer:hover .stats-pill::before {
+        opacity: 0.6;
+        transform: translate3d(0, 0, 0);
+      }
+
+      .stats-item {
+        display: flex;
+        flex-direction: column;
+        min-width: 70px;
+      }
+
+      .stats-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--text-dim);
+      }
+
+      .stats-value {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      /* TIMER */
+
+      .timer-section {
+        border-radius: var(--radius-md);
+        background: radial-gradient(
+          circle at top left,
+          #1f2937 0,
+          #020617 70%
+        );
+        border: 1px solid rgba(148, 163, 184, 0.55);
+        padding: 16px 18px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .timer-section::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 100% -10%,
+          rgba(34, 228, 255, 0.2),
+          transparent 60%
+        );
+        opacity: 0.8;
+        pointer-events: none;
+      }
+
+      .timer-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        z-index: 1;
+      }
+
+      .timer-mode {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .timer-mode::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: radial-gradient(circle at center, #22e4ff, transparent);
+        box-shadow: 0 0 12px rgba(34, 228, 255, 0.8);
+      }
+
+      .timer-value {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-shadow: 0 0 10px rgba(34, 211, 238, 0.6),
+          0 0 26px rgba(236, 72, 153, 0.7);
+        animation: timerWarp 2.3s ease-in-out infinite;
+      }
+
+      .timer-sub {
+        font-size: 11px;
+        color: var(--text-dim);
+      }
+
+      .timer-progress-track {
+        position: absolute;
+        inset: auto 16px 8px 16px;
+        height: 3px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        overflow: hidden;
+      }
+
+      .timer-progress-fill {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(
+          90deg,
+          rgba(236, 72, 153, 0.9),
+          rgba(129, 140, 248, 0.9),
+          rgba(56, 189, 248, 0.9)
+        );
+        transform-origin: left;
+      }
+
+      /* GRID SECTION */
+
+      .grid-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1;
+        min-height: 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+
+      .series-grid {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+        padding-right: 4px;
+      }
+
+      /* SERIES CARD – stronger interaction */
+
+      .series-card {
+        position: relative;
+        border-radius: 22px;
+        padding: 14px 14px 12px;
+        background: radial-gradient(
+          circle at top left,
+          #020617 0,
+          #020617 55%,
+          #000 100%
+        );
+        border: 1px solid rgba(148, 163, 184, 0.55);
+        color: inherit;
+        cursor: pointer;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        isolation: isolate;
+        overflow: hidden;
+        transition: transform 0.16s ease-out, border-color 0.16s ease-out,
+          box-shadow 0.16s ease-out, background 0.2s ease-out,
+          filter 0.18s ease-out;
+        transform-style: preserve-3d;
+      }
+
+      .series-card::before {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background: conic-gradient(
+          from 180deg,
+          rgba(236, 72, 153, 0.26),
+          rgba(56, 189, 248, 0.36),
+          rgba(129, 140, 248, 0.24),
+          transparent,
+          transparent
+        );
+        opacity: 0;
+        transform: translate3d(0, 14px, 0);
+        transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        z-index: -1;
+        mix-blend-mode: screen;
+      }
+
+      .series-card:hover::before {
+        opacity: 0.9;
+        transform: translate3d(0, 0, 0);
+      }
+
+      .series-card:hover {
+        transform: translateY(-4px) scale(1.015) rotateX(3deg);
+        border-color: rgba(236, 72, 153, 0.9);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.95),
+          0 0 30px rgba(236, 72, 153, 0.55);
+        background: radial-gradient(
+          circle at top left,
+          #020617,
+          #020617 55%,
+          #020617 100%
+        );
+        filter: saturate(1.25);
+        z-index: 10;
+      }
+
+      .series-card:active {
+        transform: translateY(-1px) scale(0.99);
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.8);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+      }
+
+      .series-title {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+
+      .series-tag {
+        font-size: 10px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(236, 72, 153, 0.9);
+        background: rgba(15, 23, 42, 0.9);
+        color: #f9a8d4;
+        box-shadow: 0 0 10px rgba(236, 72, 153, 0.7);
+      }
+
+      .card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .card-metrics {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--text-dim);
+      }
+
+      .season-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .season-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+      }
+
+      .season-label {
+        color: var(--accent-cyan);
+        font-weight: 500;
+      }
+
+      .season-bar-track {
+        position: relative;
+        height: 5px;
+        border-radius: 999px;
+        background: rgba(30, 64, 175, 0.6);
+        overflow: hidden;
+      }
+
+      .season-bar-fill {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(
+          90deg,
+          rgba(236, 72, 153, 0.9),
+          rgba(129, 140, 248, 0.9),
+          rgba(56, 189, 248, 0.9)
+        );
+        transform-origin: left;
+        animation: barGlow 1.4s cubic-bezier(0.18, 0.76, 0.3, 1) backwards;
+      }
+
+      .season-meta {
+        color: var(--text-dim);
+      }
+
+      .series-grid::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .series-grid::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .series-grid::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.7);
+        border-radius: 999px;
+      }
+
+      /* ANIMATIONS */
+
+      @keyframes auroraShift {
+        0% {
+          transform: translate3d(-8%, -10%, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(10%, 6%, 0) scale(1.1);
+        }
+        100% {
+          transform: translate3d(-4%, 14%, 0) scale(0.96);
+        }
+      }
+
+      @keyframes titleGlow {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.45));
+          background-position: 0% 50%;
+        }
+        50% {
+          filter: drop-shadow(0 0 28px rgba(34, 211, 238, 0.85));
+          background-position: 100% 50%;
+        }
+      }
+
+      @keyframes timerWarp {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+          text-shadow: 0 0 14px rgba(34, 211, 238, 0.7),
+            0 0 30px rgba(236, 72, 153, 0.7);
+        }
+        50% {
+          transform: translateY(-1px) scale(1.02);
+          text-shadow: 0 0 30px rgba(34, 211, 238, 1),
+            0 0 40px rgba(236, 72, 153, 0.9);
+        }
+      }
+
+      @keyframes barGlow {
+        0% {
+          transform: scaleX(0);
+          opacity: 0.35;
+        }
+        60% {
+          opacity: 1;
+        }
+        100% {
+          transform: scaleX(1);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .glass-layer {
+          padding: 18px;
+          max-height: 100vh;
+          border-radius: 0;
+        }
+
+        .app-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .stats-pill {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .timer-value {
+          font-size: 26px;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="aurora-bg">
+      <div class="bg-grid"></div>
       <div class="glass-layer">
         <header class="app-header">
           <div class="title-block">
@@ -618,7 +643,7 @@
           <div class="stats-pill">
             <div class="stats-item">
               <span class="stats-label">Series</span>
-              <span class="stats-value" id="stat-series">28</span>
+              <span class="stats-value" id="stat-series">0</span>
             </div>
             <div class="stats-item">
               <span class="stats-label">Seasons</span>
@@ -644,218 +669,264 @@
         <section class="grid-section">
           <h2 class="section-title">Completed catalogue</h2>
           <div class="series-grid" id="series-grid">
-            <!-- Cards are injected by JS -->
-          </div>
+            </div>
         </section>
       </div>
     </div>
 
     <script>
-  const seriesData = [/* keep exactly the same array you already have here */];
-  // if you lost it, scroll up to my previous message and paste that seriesData again.
+      // Populated based on user known favorites
+      const seriesData = [
+        {
+          title: "Breaking Bad",
+          tag: "Masterpiece",
+          seasons: [
+            { season: 1, episodes: 7, hours: 5, minutes: 47 },
+            { season: 2, episodes: 13, hours: 10, minutes: 11 },
+            { season: 3, episodes: 13, hours: 10, minutes: 16 },
+            { season: 4, episodes: 13, hours: 10, minutes: 16 },
+            { season: 5, episodes: 16, hours: 12, minutes: 46 },
+          ],
+        },
+        {
+          title: "Better Call Saul",
+          tag: "Legendary",
+          seasons: [
+            { season: 1, episodes: 10, hours: 7, minutes: 54 },
+            { season: 2, episodes: 10, hours: 7, minutes: 48 },
+            { season: 3, episodes: 10, hours: 8, minutes: 2 },
+            { season: 4, episodes: 10, hours: 8, minutes: 18 },
+            { season: 5, episodes: 10, hours: 8, minutes: 30 },
+            { season: 6, episodes: 13, hours: 11, minutes: 20 },
+          ],
+        },
+        {
+          title: "Dark",
+          tag: "Mind-bending",
+          seasons: [
+            { season: 1, episodes: 10, hours: 8, minutes: 36 },
+            { season: 2, episodes: 8, hours: 7, minutes: 10 },
+            { season: 3, episodes: 8, hours: 8, minutes: 20 },
+          ],
+        },
+        {
+          title: "Dexter",
+          tag: "Classic",
+          seasons: [
+            { season: 1, episodes: 12, hours: 10, minutes: 45 },
+            { season: 2, episodes: 12, hours: 10, minutes: 30 },
+            { season: 3, episodes: 12, hours: 10, minutes: 25 },
+            { season: 4, episodes: 12, hours: 10, minutes: 40 },
+          ],
+        },
+        {
+          title: "Stranger Things",
+          tag: "Sci-Fi",
+          seasons: [
+            { season: 1, episodes: 8, hours: 6, minutes: 35 },
+            { season: 2, episodes: 9, hours: 7, minutes: 40 },
+            { season: 3, episodes: 8, hours: 7, minutes: 25 },
+            { season: 4, episodes: 9, hours: 13, minutes: 5 },
+          ],
+        },
+      ];
 
-  const TOTAL_HOURS = 783;
-  const TOTAL_MINUTES = 15;
-  const TOTAL_MINUTES_ALL = TOTAL_HOURS * 60 + TOTAL_MINUTES;
-  const TOTAL_DAYS = TOTAL_MINUTES_ALL / 60 / 24;
-  const TOTAL_MONTHS = TOTAL_DAYS / 30;
+      const TOTAL_HOURS = 783;
+      const TOTAL_MINUTES = 15;
+      const TOTAL_MINUTES_ALL = TOTAL_HOURS * 60 + TOTAL_MINUTES;
+      const TOTAL_DAYS = TOTAL_MINUTES_ALL / 60 / 24;
+      const TOTAL_MONTHS = TOTAL_DAYS / 30;
 
-  function formatTime(valueMinutes, mode) {
-    if (mode === "hours") {
-      const hours = Math.floor(valueMinutes / 60);
-      const mins = Math.floor(valueMinutes % 60);
-      return `${hours} h ${mins} m`;
-    }
-    if (mode === "days") {
-      const days = valueMinutes / 60 / 24;
-      return `${days.toFixed(2)} days`;
-    }
-    const days = valueMinutes / 60 / 24;
-    const months = days / 30;
-    const wholeMonths = Math.floor(months);
-    const remDays = (months - wholeMonths) * 30;
-    return `${wholeMonths} months ${remDays.toFixed(1)} days`;
-  }
-
-  function animateTimer() {
-    const modeEl = document.getElementById("timer-mode");
-    const valueEl = document.getElementById("timer-value");
-    const track = document.createElement("div");
-    track.className = "timer-progress-track";
-    const fill = document.createElement("div");
-    fill.className = "timer-progress-fill";
-    track.appendChild(fill);
-    document.querySelector(".timer-section").appendChild(track);
-
-    const duration = 6000;
-    const start = performance.now();
-
-    function tick(now) {
-      const elapsed = now - start;
-      const p = Math.min(elapsed / duration, 1);
-      let mode = "hours";
-      if (p >= 0.55 && p < 0.8) mode = "days";
-      else if (p >= 0.8) mode = "months";
-
-      const currentMinutes = TOTAL_MINUTES_ALL * p;
-      modeEl.textContent =
-        mode === "hours"
-          ? "Hours watched"
-          : mode === "days"
-          ? "Days watched"
-          : "Months watched";
-      valueEl.textContent = formatTime(currentMinutes, mode);
-      fill.style.transform = `scaleX(${p})`;
-
-      if (p < 1) requestAnimationFrame(tick);
-    }
-
-    requestAnimationFrame(tick);
-  }
-
-  function buildGrid() {
-    const grid = document.getElementById("series-grid");
-    let totalSeasons = 0;
-    let totalEpisodes = 0;
-
-    seriesData.forEach((s, index) => {
-      const card = document.createElement("button");
-      card.className = "series-card";
-      card.type = "button";
-
-      const header = document.createElement("div");
-      header.className = "card-header";
-
-      const title = document.createElement("span");
-      title.className = "series-title";
-      title.textContent = s.title;
-      header.appendChild(title);
-
-      if (s.tag) {
-        const tag = document.createElement("span");
-        tag.className = "series-tag";
-        tag.textContent = s.tag;
-        header.appendChild(tag);
+      function formatTime(valueMinutes, mode) {
+        if (mode === "hours") {
+          const hours = Math.floor(valueMinutes / 60);
+          const mins = Math.floor(valueMinutes % 60);
+          return `${hours} h ${mins} m`;
+        }
+        if (mode === "days") {
+          const days = valueMinutes / 60 / 24;
+          return `${days.toFixed(2)} days`;
+        }
+        const days = valueMinutes / 60 / 24;
+        const months = days / 30;
+        const wholeMonths = Math.floor(months);
+        const remDays = (months - wholeMonths) * 30;
+        return `${wholeMonths} months ${remDays.toFixed(1)} days`;
       }
 
-      const body = document.createElement("div");
-      body.className = "card-body";
-
-      const metrics = document.createElement("div");
-      metrics.className = "card-metrics";
-
-      const seasonsCount = s.seasons.length;
-      totalSeasons += seasonsCount;
-      const episodesCount = s.seasons.reduce(
-        (sum, se) => sum + se.episodes,
-        0
-      );
-      totalEpisodes += episodesCount;
-      const totalMinutes = s.seasons.reduce(
-        (sum, se) => sum + se.hours * 60 + se.minutes,
-        0
-      );
-      const hours = Math.floor(totalMinutes / 60);
-      const mins = totalMinutes % 60;
-
-      const seasonsSpan = document.createElement("span");
-      seasonsSpan.textContent = `${seasonsCount} seasons`;
-
-      const runtimeSpan = document.createElement("span");
-      runtimeSpan.textContent = `${hours} h ${mins} m`;
-
-      metrics.appendChild(seasonsSpan);
-      metrics.appendChild(runtimeSpan);
-
-      const seasonBars = document.createElement("div");
-      seasonBars.className = "season-bars";
-
-      s.seasons.forEach((se, i) => {
-        const row = document.createElement("div");
-        row.className = "season-row";
-
-        const label = document.createElement("div");
-        label.className = "season-label";
-        label.textContent = `S${se.season}`;
-
+      function animateTimer() {
+        const modeEl = document.getElementById("timer-mode");
+        const valueEl = document.getElementById("timer-value");
         const track = document.createElement("div");
-        track.className = "season-bar-track";
-
+        track.className = "timer-progress-track";
         const fill = document.createElement("div");
-        fill.className = "season-bar-fill";
-        fill.style.width = `${40 + se.episodes * 2.5}%`;
-        fill.style.animationDelay = `${(index * 0.03 + i * 0.06).toFixed(
-          2
-        )}s`;
-
+        fill.className = "timer-progress-fill";
         track.appendChild(fill);
+        document.querySelector(".timer-section").appendChild(track);
 
-        const meta = document.createElement("div");
-        meta.className = "season-meta";
-        meta.textContent = `${se.episodes} ep · ${se.hours}h ${se.minutes}m`;
+        const duration = 6000;
+        const start = performance.now();
 
-        row.appendChild(label);
-        row.appendChild(track);
-        row.appendChild(meta);
+        function tick(now) {
+          const elapsed = now - start;
+          const p = Math.min(elapsed / duration, 1);
+          let mode = "hours";
+          if (p >= 0.55 && p < 0.8) mode = "days";
+          else if (p >= 0.8) mode = "months";
 
-        seasonBars.appendChild(row);
+          const currentMinutes = TOTAL_MINUTES_ALL * p;
+          modeEl.textContent =
+            mode === "hours"
+              ? "Hours watched"
+              : mode === "days"
+              ? "Days watched"
+              : "Months watched";
+          valueEl.textContent = formatTime(currentMinutes, mode);
+          fill.style.transform = `scaleX(${p})`;
+
+          if (p < 1) requestAnimationFrame(tick);
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      function buildGrid() {
+        const grid = document.getElementById("series-grid");
+        let totalSeasons = 0;
+        let totalEpisodes = 0;
+
+        seriesData.forEach((s, index) => {
+          const card = document.createElement("button");
+          card.className = "series-card";
+          card.type = "button";
+
+          const header = document.createElement("div");
+          header.className = "card-header";
+
+          const title = document.createElement("span");
+          title.className = "series-title";
+          title.textContent = s.title;
+          header.appendChild(title);
+
+          if (s.tag) {
+            const tag = document.createElement("span");
+            tag.className = "series-tag";
+            tag.textContent = s.tag;
+            header.appendChild(tag);
+          }
+
+          const body = document.createElement("div");
+          body.className = "card-body";
+
+          const metrics = document.createElement("div");
+          metrics.className = "card-metrics";
+
+          const seasonsCount = s.seasons.length;
+          totalSeasons += seasonsCount;
+          const episodesCount = s.seasons.reduce(
+            (sum, se) => sum + se.episodes,
+            0
+          );
+          totalEpisodes += episodesCount;
+          const totalMinutes = s.seasons.reduce(
+            (sum, se) => sum + se.hours * 60 + se.minutes,
+            0
+          );
+          const hours = Math.floor(totalMinutes / 60);
+          const mins = totalMinutes % 60;
+
+          const seasonsSpan = document.createElement("span");
+          seasonsSpan.textContent = `${seasonsCount} seasons`;
+
+          const runtimeSpan = document.createElement("span");
+          runtimeSpan.textContent = `${hours} h ${mins} m`;
+
+          metrics.appendChild(seasonsSpan);
+          metrics.appendChild(runtimeSpan);
+
+          const seasonBars = document.createElement("div");
+          seasonBars.className = "season-bars";
+
+          s.seasons.forEach((se, i) => {
+            const row = document.createElement("div");
+            row.className = "season-row";
+
+            const label = document.createElement("div");
+            label.className = "season-label";
+            label.textContent = `S${se.season}`;
+
+            const track = document.createElement("div");
+            track.className = "season-bar-track";
+
+            const fill = document.createElement("div");
+            fill.className = "season-bar-fill";
+            fill.style.width = `${40 + se.episodes * 2.5}%`;
+            fill.style.animationDelay = `${(index * 0.03 + i * 0.06).toFixed(
+              2
+            )}s`;
+
+            track.appendChild(fill);
+
+            const meta = document.createElement("div");
+            meta.className = "season-meta";
+            meta.textContent = `${se.episodes} ep · ${se.hours}h ${se.minutes}m`;
+
+            row.appendChild(label);
+            row.appendChild(track);
+            row.appendChild(meta);
+
+            seasonBars.appendChild(row);
+          });
+
+          body.appendChild(metrics);
+          body.appendChild(seasonBars);
+
+          card.appendChild(header);
+          card.appendChild(body);
+
+          // staggered entrance
+          card.style.opacity = "0";
+          card.style.transform = "translateY(14px) scale(0.98)";
+          setTimeout(() => {
+            card.style.transition =
+              "opacity 0.28s ease-out, transform 0.28s ease-out";
+            card.style.opacity = "1";
+            card.style.transform = "translateY(0) scale(1)";
+          }, 120 + index * 40);
+
+          grid.appendChild(card);
+        });
+
+        document.getElementById("stat-series").textContent = seriesData.length;
+        document.getElementById("stat-seasons").textContent = totalSeasons;
+        document.getElementById("stat-episodes").textContent = totalEpisodes;
+      }
+
+      function enableParallax() {
+        const layer = document.querySelector(".glass-layer");
+
+        layer.addEventListener("mousemove", (e) => {
+          const rect = layer.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+          const maxTilt = 4;
+          // Apply tilt only to container to avoid appending strings indefinitely
+          layer.style.transform = `perspective(1400px) rotateX(${(-y * maxTilt).toFixed(
+            2
+          )}deg) rotateY(${(x * maxTilt).toFixed(2)}deg)`;
+        });
+
+        layer.addEventListener("mouseleave", () => {
+          layer.style.transform = "none";
+        });
+      }
+
+      window.addEventListener("load", () => {
+        buildGrid();
+        animateTimer();
+        enableParallax();
       });
-
-      body.appendChild(metrics);
-      body.appendChild(seasonBars);
-
-      card.appendChild(header);
-      card.appendChild(body);
-
-      // staggered entrance
-      card.style.opacity = "0";
-      card.style.transform = "translateY(14px) scale(0.98)";
-      setTimeout(() => {
-        card.style.transition =
-          "opacity 0.28s ease-out, transform 0.28s ease-out";
-        card.style.opacity = "1";
-        card.style.transform = "translateY(0) scale(1)";
-      }, 120 + index * 40);
-
-      grid.appendChild(card);
-    });
-
-    document.getElementById("stat-seasons").textContent = totalSeasons;
-    document.getElementById("stat-episodes").textContent = totalEpisodes;
-  }
-
-  function enableParallax() {
-    const layer = document.querySelector(".glass-layer");
-    const cards = document.querySelectorAll(".series-card");
-
-    layer.addEventListener("mousemove", (e) => {
-      const rect = layer.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-      const maxTilt = 4;
-      layer.style.transform = `perspective(1400px) rotateX(${(-y *
-        maxTilt).toFixed(2)}deg) rotateY(${(x * maxTilt).toFixed(2)}deg)`;
-
-      cards.forEach((card) => {
-        const depth = 6;
-        card.style.transform += ` translateX(${(-x * depth).toFixed(
-          1
-        )}px) translateY(${(-y * depth).toFixed(1)}px)`;
-      });
-    });
-
-    layer.addEventListener("mouseleave", () => {
-      layer.style.transform = "none";
-    });
-  }
-
-  window.addEventListener("load", () => {
-    buildGrid();
-    animateTimer();
-    enableParallax();
-  });
-</script>
-
+    </script>
   </body>
 </html>
