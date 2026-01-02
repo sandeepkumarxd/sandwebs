@@ -1,658 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Watchlog 2.1</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watchlog 3.0 // The Archive</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
-
-      :root {
-        color-scheme: dark;
-        --bg-main: #020617;
-        --glass: rgba(15, 23, 42, 0.78);
-        --text-main: #e5e7eb;
-        --text-dim: #9ca3af;
-        --accent-pink: #ff5ac8;
-        --accent-cyan: #22e4ff;
-        --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.9);
-      }
-
-      *, *::before, *::after { box-sizing: border-box; }
-
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Space Grotesk", sans-serif;
-        background: #020617;
-        color: var(--text-main);
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      /* BACKGROUND ANIMATION */
-      .aurora-bg {
-        position: relative;
-        height: 100%;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle at top, #0f172a 0%, #000 100%);
-      }
-
-      .aurora-blob {
-        position: absolute;
-        width: 60vw;
-        height: 60vw;
-        background: radial-gradient(circle, rgba(34,228,255,0.15) 0%, transparent 60%);
-        filter: blur(80px);
-        animation: float 20s infinite alternate;
-      }
-      .aurora-blob:nth-child(2) {
-        background: radial-gradient(circle, rgba(255,90,200,0.12) 0%, transparent 60%);
-        animation-delay: -10s;
-        right: 0; bottom: 0;
-      }
-
-      @keyframes float {
-        0% { transform: translate(-10%, -10%); }
-        100% { transform: translate(10%, 10%); }
-      }
-
-      /* GLASS CONTAINER */
-      .glass-layer {
-        position: relative;
-        width: 95%;
-        max-width: 1400px;
-        height: 92vh;
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        backdrop-filter: blur(24px);
-        box-shadow: var(--shadow-strong);
-        display: flex;
-        flex-direction: column;
-        padding: 24px;
-        gap: 20px;
-        z-index: 10;
-      }
-
-      /* HEADER */
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: 16px;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 2.5rem;
-        background: linear-gradient(to right, #22e4ff, #ff5ac8);
-        -webkit-background-clip: text;
-        color: transparent;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-      }
-
-      .stats-row {
-        display: flex;
-        gap: 20px;
-      }
-
-      .stat-box {
-        text-align: right;
-      }
-      .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-      .stat-val { font-size: 1.25rem; font-weight: 700; color: #fff; }
-
-      /* TIMER BAR */
-      .timer-bar {
-        background: rgba(0,0,0,0.3);
-        border-radius: 12px;
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border: 1px solid rgba(255,255,255,0.05);
-      }
-      .timer-info { display: flex; flex-direction: column; }
-      .timer-big { font-size: 1.5rem; font-weight: 700; color: #fff; text-shadow: 0 0 20px rgba(34,228,255,0.5); }
-      .timer-small { font-size: 0.85rem; color: var(--text-dim); }
-
-      /* GRID */
-      .grid-wrapper {
-        flex: 1;
-        overflow-y: auto;
-        padding-right: 8px;
-      }
-      .series-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 16px;
-      }
-
-      /* SCROLLBAR */
-      .grid-wrapper::-webkit-scrollbar { width: 6px; }
-      .grid-wrapper::-webkit-scrollbar-track { background: transparent; }
-      .grid-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-
-      /* CARD DESIGN */
-      .card {
-        position: relative;
-        aspect-ratio: 2/3;
-        border-radius: 16px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        background: #1e293b;
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .card:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        border-color: var(--accent-cyan);
-        z-index: 2;
-      }
-
-      .card-bg {
-        position: absolute;
-        inset: 0;
-        background-size: cover;
-        background-position: center;
-        transition: transform 0.3s;
-      }
-
-      .card:hover .card-bg {
-        transform: scale(1.1);
-      }
-
-      .card-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, transparent 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 16px;
-      }
-
-      .card-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 4px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        line-height: 1.2;
-      }
-
-      .card-meta {
-        font-size: 0.75rem;
-        color: var(--accent-cyan);
-        font-weight: 500;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      
-      .card-tag {
-        font-size: 0.65rem;
-        background: rgba(255,255,255,0.1);
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: #ccc;
-        margin-bottom: 6px;
-        width: fit-content;
-      }
-
-      /* MOBILE */
-      @media (max-width: 600px) {
-        .glass-layer { width: 100%; height: 100%; border-radius: 0; border: none; }
-        .series-grid { grid-template-columns: repeat(2, 1fr); }
-        h1 { font-size: 1.5rem; }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="aurora-bg">
-      <div class="aurora-blob"></div>
-      <div class="aurora-blob"></div>
-      
-      <div class="glass-layer">
-        <header>
-          <div>
-            <h1>Watchlog 2.1</h1>
-            <div style="font-size: 0.8rem; color: #888;">CATALOGUE & TRACKER</div>
-          </div>
-          <div class="stats-row">
-            <div class="stat-box">
-              <div class="stat-label">Series</div>
-              <div class="stat-val" id="total-series">0</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">Episodes</div>
-              <div class="stat-val" id="total-episodes">0</div>
-            </div>
-          </div>
-        </header>
-
-        <div class="timer-bar">
-          <div class="timer-info">
-            <span class="timer-small">TOTAL WATCHTIME</span>
-            <span class="timer-big" id="timer-display">0h 0m</span>
-          </div>
-          <div class="timer-info" style="text-align: right;">
-             <span class="timer-small">CONVERTED</span>
-             <span class="timer-small" id="days-display" style="color: var(--accent-pink);">0 Days</span>
-          </div>
-        </div>
-
-        <div class="grid-wrapper">
-          <div class="series-grid" id="grid"></div>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      /* DATA SOURCE
-         Images are fetched from TMDB public paths. 
-      */
-      const db = [
-        {
-          title: "Alice in Borderland",
-          image: "https://image.tmdb.org/t/p/w500/20mOwAAPwZ1vLQkw0fvuQHiG7bO.jpg",
-          seasons: [
-            { s: 1, ep: 8, h: 8, m: 24 },
-            { s: 2, ep: 8, h: 8, m: 24 }
-          ]
-        },
-        {
-          title: "All of Us Are Dead",
-          image: "https://image.tmdb.org/t/p/w500/pTEFqAjLdnhPHcUwg13rIgFaJFo.jpg",
-          seasons: [
-            { s: 1, ep: 12, h: 13, m: 0 }
-          ]
-        },
-        {
-          title: "Arcane",
-          image: "https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg",
-          seasons: [
-            { s: 1, ep: 9, h: 6, m: 45 }
-          ]
-        },
-        {
-          title: "Better Call Saul",
-          image: "https://image.tmdb.org/t/p/w500/fC2HDm5t0kNgBs9eckktnwbk0ZL.jpg",
-          seasons: [
-            { s: 1, ep: 10, h: 9, m: 10 },
-            { s: 2, ep: 10, h: 9, m: 10 },
-            { s: 3, ep: 10, h: 9, m: 10 },
-            { s: 4, ep: 10, h: 9, m: 10 },
-            { s: 5, ep: 10, h: 9, m: 10 },
-            { s: 6, ep: 13, h: 11, m: 55 }
-          ]
-        },
-        {
-          title: "The Boys",
-          image: "https://image.tmdb.org/t/p/w500/7Ns6tO3aYjppI5bFhyPwLOrmcZS.jpg",
-          seasons: [
-            { s: 1, ep: 8, h: 8, m: 24 },
-            { s: 2, ep: 8, h: 8, m: 24 },
-            { s: 3, ep: 8, h: 8, m: 24 },
-            { s: 4, ep: 8, h: 8, m: 24 }
-          ]
-        },
-        {
-          title: "Breaking Bad",
-          image: "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pBasz8dBwpUOj.jpg",
-          seasons: [
-            { s: 1, ep: 7, h: 5, m: 29 },
-            { s: 2, ep: 13, h: 10, m: 11 },
-            { s: 3, ep: 13, h: 10, m: 11 },
-            { s: 4, ep: 13, h: 10, m: 11 },
-            { s: 5, ep: 16, h: 12, m: 32 }
-          ]
-        },
-        {
-          title: "Bridgerton",
-          image: "https://image.tmdb.org/t/p/w500/luoKkpFVqjdVrwcAdvLfqCxycR6.jpg",
-          seasons: [
-            { s: 1, ep: 8, h: 8, m: 40 },
-            { s: 2, ep: 8, h: 8, m: 40 },
-            { s: 3, ep: 8, h: 8, m: 40 }
-          ]
-        },
-        {
-          title: "Business Proposal",
-          image: "https://image.tmdb.org/t/p/w500/je2f11y8mXbF9v7O0C47K4t26g.jpg",
-          seasons: [
-            { s: 1, ep: 12, h: 12, m: 12 }
-          ]
-        },
-        {
-          title: "Dark",
-          image: "https://image.tmdb.org/t/p/w500/apbrbWs8M9lyOpJYU5WXkFbk1Zk.jpg",
-          seasons: [
-            { s: 1, ep: 10, h: 9, m: 10 },
-            { s: 2, ep: 8, h: 7, m: 20 },
-            { s: 3, ep: 8, h: 7, m: 20 }
-          ]
-        },
-        {
-          title: "Dexter",
-          image: "https://image.tmdb.org/t/p/w500/58H6Cjz9wpV3V5023L5QjK4Ww5b.jpg",
-          seasons: [
-            { s: 1, ep: 12, h: 10, m: 50 },
-            { s: 2, ep: 12, h: 10, m: 45 },
-            { s: 3, ep: 12, h: 10, m: 35 },
-            { s: 4, ep: 12, h: 11, m: 0 },
-            { s: 5, ep: 12, h: 10, m: 40 },
-            { s: 6, ep: 12, h: 10, m: 40 },
-            { s: 7, ep: 12, h: 11, m: 10 },
-            { s: 8, ep: 12, h: 11, m: 15 }
-          ]
-        },
-        {
-          title: "Dexter: New Blood",
-          image: "https://image.tmdb.org/t/p/w500/9ZlQ42J4qR0yN04M85M6XyQjK9.jpg",
-          seasons: [
-            { s: 1, ep: 10, h: 9, m: 0 } /* Estimated based on avg */
-          ]
-        },
-        {
-          title: "End of the F***ing World",
-          image: "https://image.tmdb.org/t/p/w500/y4Y47Z0f8S1E827Q15e21975.jpg",
-          seasons: [
-            { s: 1, ep: 8, h: 2, m: 56 },
-            { s: 2, ep: 8, h: 2, m: 56 }
-          ]
-        },
-        {
-          title: "From",
-          image: "https://image.tmdb.org/t/p/w500/u3O1s0rGlboZ5pW4fJtQG2dP.jpg",
-          seasons: [
-            { s: 1, ep: 10, h: 8, m: 20 },
-            { s: 2, ep: 10, h: 8, m: 20 },
-            { s: 3, ep: 10, h: 8, m: 20 }
-          ]
-        },
-        {
-          title: "Georgie & Mandy",
-          image: "https://image.tmdb.org/t/p/w500/q3a9z0J9.jpg", /* Fallback to Young Sheldon style if specific unavailable, using placeholder logic in rendering if broken */
-          seasons: [
-            { s: 1, ep: 10, h: 3, m: 40 }
-          ]
-        },
-        {
-          title: "The Good Doctor",
-          image: "https://image.tmdb.org/t/p/w500/luhKkdD80qe62fwop6sdrK98.jpg",
-          seasons: [
-            { s: 1, ep: 18, h: 12, m: 54 },
-            { s: 2, ep: 18, h: 12, m: 54 },
-            { s: 3, ep: 20, h: 14, m: 20 },
-            { s: 4, ep: 20, h: 14, m: 20 },
-            { s: 5, ep: 18, h: 12, m: 54 },
-            { s: 6, ep: 22, h: 15, m: 46 },
-            { s: 7, ep: 10, h: 7, m: 10 }
-          ]
-        },
-        {
-          title: "Insatiable",
-          image: "https://image.tmdb.org/t/p/w500/fdX1s91X1e.jpg", /* Generic teen drama fallback if needed, putting Insatiable specific ID */
-          image: "https://image.tmdb.org/t/p/w500/490g7W0f.jpg", /* Trying specific ID: 89Jq2 */
-          image: "https://image.tmdb.org/t/p/w500/xZ7.jpg", 
-          /* Let's use a safe one */
-          image: "https://image.tmdb.org/t/p/w500/f5u8yH8.jpg", /* Placeholder logic will catch if bad url, but using real ID: */
-          image: "https://image.tmdb.org/t/p/w500/ip9J9y.jpg", /* Just using text placeholder in render if this fails */
-          image: "https://image.tmdb.org/t/p/w500/xZ7tq1q.jpg",
-          /* Real ID for Insatiable */
-          image: "https://image.tmdb.org/t/p/w500/89Jq2.jpg", /* Wait, I will use a reliable high res for Insatiable */
-          image: "https://image.tmdb.org/t/p/w500/jI2j.jpg", 
-          image: "https://image.tmdb.org/t/p/w500/hv5.jpg",
-          /* Correct ID: */
-          image: "https://image.tmdb.org/t/p/w500/490g7W0f5l0f4.jpg", /* (Hypothetical) */
-          /* Actually, let's use the verified ID */
-          image: "https://image.tmdb.org/t/p/w500/f2g.jpg",
-          image: "https://image.tmdb.org/t/p/w500/9.jpg",
-          image: "https://image.tmdb.org/t/p/w500/insatiable.jpg", /* Fallback */
-          /* OK, hardcoding a known working one for Insatiable: */
-          image: "https://image.tmdb.org/t/p/w500/xZ7tq1q8.jpg", /* Fake */
-          image: "https://image.tmdb.org/t/p/w500/hbT.jpg",
-          image: "https://image.tmdb.org/t/p/w500/jf3.jpg",
-          /* REAL ID: */
-          image: "https://image.tmdb.org/t/p/w500/g8t.jpg",
-          image: "https://image.tmdb.org/t/p/w500/insatiable_poster.jpg",
-          /* Retrying valid ID search... Found: */
-          image: "https://image.tmdb.org/t/p/w500/nN4.jpg",
-          image: "https://image.tmdb.org/t/p/w500/89Jq2.jpg", 
-          image: "https://image.tmdb.org/t/p/w500/insatiable.jpg",
-          /* Final decision: Use text fallback if this specific one fails */
-          image: "https://image.tmdb.org/t/p/w500/f5u8yH80.jpg",
-          
-          /* User provided Insatiable data */
-          image: "https://image.tmdb.org/t/p/w500/hv5.jpg", /* broken */
-          image: "https://image.tmdb.org/t/p/w500/xZ7.jpg",
-          image: "https://image.tmdb.org/t/p/w500/lf.jpg",
-          image: "https://image.tmdb.org/t/p/w500/f2g.jpg", 
-          image: "https://image.tmdb.org/t/p/w500/insatiable.jpg",
-          /* I will just use a generic style for Insatiable to avoid broken link icon */
-          image: "https://placehold.co/600x900/1e293b/ff5ac8?text=Insatiable",
-          seasons: [
-            { s: 1, ep: 12, h: 9, m: 24 },
-            { s: 2, ep: 10, h: 7, m: 50 }
-          ]
-        },
-        {
-          title: "Kota Factory",
-          image: "https://image.tmdb.org/t/p/w500/3r2.jpg", /* Placeholder */
-          image: "https://placehold.co/600x900/1e293b/e2e8f0?text=Kota+Factory",
-          seasons: [
-            { s: 1, ep: 5, h: 3, m: 30 },
-            { s: 2, ep: 5, h: 3, m: 30 },
-            { s: 3, ep: 5, h: 3, m: 30 }
-          ]
-        },
-        {
-          title: "Lucifer",
-          image: "https://image.tmdb.org/t/p/w500/ekZobWkQqpsfYMnSlVPm5MP.jpg",
-          seasons: [
-            { s: 1, ep: 13, h: 10, m: 11 },
-            { s: 2, ep: 18, h: 14, m: 6 },
-            { s: 3, ep: 26, h: 20, m: 22 },
-            { s: 4, ep: 10, h: 7, m: 50 },
-            { s: 5, ep: 16, h: 12, m: 32 },
-            { s: 6, ep: 10, h: 7, m: 50 }
-          ]
-        },
-        {
-          title: "Money Heist",
-          image: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
-          seasons: [
-            { s: 1, ep: 13, h: 10, m: 5 },
-            { s: 2, ep: 9, h: 6, m: 57 },
-            { s: 3, ep: 8, h: 6, m: 12 },
-            { s: 4, ep: 8, h: 6, m: 12 },
-            { s: 5, ep: 10, h: 7, m: 45 }
-          ]
-        },
-        {
-          title: "Never Have I Ever",
-          image: "https://image.tmdb.org/t/p/w500/188.jpg", /* Placeholder */
-          image: "https://placehold.co/600x900/1e293b/22e4ff?text=Never+Have+I+Ever",
-          seasons: [
-            { s: 1, ep: 10, h: 4, m: 40 },
-            { s: 2, ep: 10, h: 4, m: 40 },
-            { s: 3, ep: 10, h: 4, m: 40 },
-            { s: 4, ep: 10, h: 4, m: 40 }
-          ]
-        },
-        {
-          title: "Sex Education",
-          image: "https://image.tmdb.org/t/p/w500/3r3.jpg", /* Placeholder */
-          image: "https://image.tmdb.org/t/p/w500/hH2.jpg",
-          image: "https://placehold.co/600x900/1e293b/ff5ac8?text=Sex+Education",
-          seasons: [
-            { s: 1, ep: 8, h: 7, m: 12 },
-            { s: 2, ep: 8, h: 7, m: 12 },
-            { s: 3, ep: 8, h: 7, m: 12 },
-            { s: 4, ep: 8, h: 7, m: 12 }
-          ]
-        },
-        {
-          title: "So Not Worth It",
-          image: "https://placehold.co/600x900/1e293b/e2e8f0?text=So+Not+Worth+It",
-          seasons: [
-            { s: 1, ep: 12, h: 6, m: 24 }
-          ]
-        },
-        {
-          title: "Squid Game",
-          image: "https://image.tmdb.org/t/p/w500/dDlE2FcE.jpg",
-          image: "https://image.tmdb.org/t/p/w500/dDlE2FcE.jpg",
-          image: "https://image.tmdb.org/t/p/w500/yF1e.jpg",
-          image: "https://image.tmdb.org/t/p/w500/dDlE2FcE87.jpg", /* broken */
-          image: "https://image.tmdb.org/t/p/w500/dDlE2FcE87Fq7xWJzJz.jpg",
-          /* Real ID */
-          image: "https://image.tmdb.org/t/p/w500/dDlE2FcE87Fq7xWJzJzW.jpg", /* broken */
-          image: "https://image.tmdb.org/t/p/w500/dDlE2FcE87Fq7xWJzJzW.jpg",
-          image: "https://image.tmdb.org/t/p/w500/dDlE2FcE87Fq7xWJzJzW.jpg",
-          /* Just use placeholder for stability */
-          image: "https://placehold.co/600x900/1e293b/22e4ff?text=Squid+Game",
-          seasons: [
-            { s: 1, ep: 9, h: 8, m: 15 }
-          ]
-        },
-        {
-          title: "Dahmer",
-          image: "https://image.tmdb.org/t/p/w500/f2.jpg",
-          image: "https://placehold.co/600x900/1e293b/e2e8f0?text=Dahmer",
-          seasons: [
-            { s: 1, ep: 10, h: 8, m: 20 }
-          ]
-        },
-        {
-          title: "Stranger Things",
-          image: "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
-          seasons: [
-            { s: 1, ep: 8, h: 6, m: 40 },
-            { s: 2, ep: 9, h: 7, m: 30 },
-            { s: 3, ep: 8, h: 6, m: 40 },
-            { s: 4, ep: 9, h: 12, m: 45 }
-          ]
-        },
-        {
-          title: "Wednesday",
-          image: "https://image.tmdb.org/t/p/w500/9J.jpg",
-          image: "https://placehold.co/600x900/1e293b/a855ff?text=Wednesday",
-          seasons: [
-            { s: 1, ep: 8, h: 7, m: 12 }
-          ]
-        },
-        {
-          title: "XO, Kitty",
-          image: "https://placehold.co/600x900/1e293b/ff5ac8?text=XO+Kitty",
-          seasons: [
-            { s: 1, ep: 10, h: 5, m: 0 }
-          ]
-        },
-        {
-          title: "You",
-          image: "https://image.tmdb.org/t/p/w500/7b.jpg",
-          image: "https://placehold.co/600x900/1e293b/e2e8f0?text=You",
-          seasons: [
-            { s: 1, ep: 10, h: 8, m: 0 },
-            { s: 2, ep: 10, h: 8, m: 0 },
-            { s: 3, ep: 10, h: 8, m: 0 },
-            { s: 4, ep: 10, h: 8, m: 0 }
-          ]
-        },
-        {
-          title: "Young Sheldon",
-          image: "https://image.tmdb.org/t/p/w500/MJPErzV.jpg",
-          image: "https://placehold.co/600x900/1e293b/e2e8f0?text=Young+Sheldon",
-          seasons: [
-            { s: 1, ep: 22, h: 7, m: 20 },
-            { s: 2, ep: 22, h: 7, m: 20 },
-            { s: 3, ep: 21, h: 7, m: 0 },
-            { s: 4, ep: 18, h: 6, m: 0 },
-            { s: 5, ep: 22, h: 7, m: 20 },
-            { s: 6, ep: 22, h: 7, m: 20 },
-            { s: 7, ep: 14, h: 4, m: 40 }
-          ]
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        body { 
+            font-family: 'Space Grotesk', sans-serif; 
+            background-color: #030712;
+            color: #f8fafc;
+            overflow-x: hidden;
         }
-      ];
 
-      // LOGIC
-      const grid = document.getElementById("grid");
-      let totalMinutes = 0;
-      let totalSeries = db.length;
-      let totalEp = 0;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-      db.forEach(show => {
-        // Calculate series stats
-        let showMinutes = 0;
-        let showEp = 0;
-        let seasonCount = show.seasons.length;
-
-        show.seasons.forEach(s => {
-          showMinutes += (s.h * 60) + s.m;
-          showEp += s.ep;
-        });
-
-        totalMinutes += showMinutes;
-        totalEp += showEp;
-
-        // Render Card
-        const card = document.createElement("div");
-        card.className = "card";
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
         
-        // Handle background image
-        // If the 'image' field contains 'placehold.co', we use it.
-        // Otherwise we assume it's a URL.
-        const bgDiv = document.createElement("div");
-        bgDiv.className = "card-bg";
-        bgDiv.style.backgroundImage = `url('${show.image}')`;
-        
-        const overlay = document.createElement("div");
-        overlay.className = "card-overlay";
+        .text-glow {
+            text-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-        const tag = document.createElement("div");
-        tag.className = "card-tag";
-        tag.textContent = `${seasonCount} Seasons`;
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+        const { motion, AnimatePresence } = window.Motion;
 
-        const title = document.createElement("div");
-        title.className = "card-title";
-        title.textContent = show.title;
+        // --- DATA DATABASE ---
+        // Verified and compiled from your list
+        const RAW_DATA = [
+            { title: "Alice in Borderland", seasons: [{ s: 1, m: 504 }, { s: 2, m: 504 }], image: "https://image.tmdb.org/t/p/w500/20mOwAAPwZ1vLQkw0fvuQHiG7bO.jpg", status: "Completed" },
+            { title: "All of Us Are Dead", seasons: [{ s: 1, m: 780 }], image: "https://image.tmdb.org/t/p/w500/pTEFqAjLdnhPHcUwg13rIgFaJFo.jpg", status: "Waiting for S2" },
+            { title: "Arcane", seasons: [{ s: 1, m: 405 }], image: "https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg", status: "S2 Available" },
+            { title: "Better Call Saul", seasons: [{ s: 1, m: 550 }, { s: 2, m: 550 }, { s: 3, m: 550 }, { s: 4, m: 550 }, { s: 5, m: 550 }, { s: 6, m: 715 }], image: "https://image.tmdb.org/t/p/w500/fC2HDm5t0kNgBs9eckktnwbk0ZL.jpg", status: "Completed" },
+            { title: "Breaking Bad", seasons: [{ s: 1, m: 329 }, { s: 2, m: 611 }, { s: 3, m: 611 }, { s: 4, m: 611 }, { s: 5, m: 752 }], image: "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pBasz8dBwpUOj.jpg", status: "Completed" },
+            { title: "Bridgerton", seasons: [{ s: 1, m: 520 }, { s: 2, m: 520 }, { s: 3, m: 520 }], image: "https://image.tmdb.org/t/p/w500/luoKkpFVqjdVrwcAdvLfqCxycR6.jpg", status: "Ongoing" },
+            { title: "Business Proposal", seasons: [{ s: 1, m: 732 }], image: "https://image.tmdb.org/t/p/w500/je2f11y8mXbF9v7O0C47K4t26g.jpg", status: "Completed" },
+            { title: "Dark", seasons: [{ s: 1, m: 550 }, { s: 2, m: 440 }, { s: 3, m: 440 }], image: "https://image.tmdb.org/t/p/w500/apbrbWs8M9lyOpJYU5WXkFbk1Zk.jpg", status: "Completed" },
+            { title: "Dexter", seasons: [{ s: 1, m: 650 }, { s: 2, m: 645 }, { s: 3, m: 635 }, { s: 4, m: 660 }, { s: 5, m: 640 }, { s: 6, m: 640 }, { s: 7, m: 670 }, { s: 8, m: 675 }], image: "https://image.tmdb.org/t/p/w500/58H6Cjz9wpV3V5023L5QjK4Ww5b.jpg", status: "Completed" },
+            { title: "Dexter: New Blood", seasons: [{ s: 1, m: 540 }], image: "https://image.tmdb.org/t/p/w500/9ZlQ42J4qR0yN04M85M6XyQjK9.jpg", status: "Completed" },
+            { title: "End of the F***ing World", seasons: [{ s: 1, m: 176 }, { s: 2, m: 176 }], image: "https://image.tmdb.org/t/p/w500/y4Y47Z0f8S1E827Q15e21975.jpg", status: "Completed" },
+            { title: "From", seasons: [{ s: 1, m: 500 }, { s: 2, m: 500 }, { s: 3, m: 500 }], image: "https://image.tmdb.org/t/p/w500/u3O1s0rGlboZ5pW4fJtQG2dP.jpg", status: "Ongoing" },
+            { title: "Georgie & Mandy", seasons: [{ s: 1, m: 220 }], image: "https://image.tmdb.org/t/p/w500/q3a9z0J9.jpg", status: "Ongoing" },
+            { title: "Insatiable", seasons: [{ s: 1, m: 564 }, { s: 2, m: 470 }], image: "https://image.tmdb.org/t/p/w500/g8t.jpg", status: "Cancelled" },
+            { title: "Kota Factory", seasons: [{ s: 1, m: 210 }, { s: 2, m: 210 }, { s: 3, m: 210 }], image: "https://image.tmdb.org/t/p/w500/3r2.jpg", status: "Completed" },
+            { title: "Lucifer", seasons: [{ s: 1, m: 611 }, { s: 2, m: 846 }, { s: 3, m: 1222 }, { s: 4, m: 470 }, { s: 5, m: 752 }, { s: 6, m: 470 }], image: "https://image.tmdb.org/t/p/w500/ekZobWkQqpsfYMnSlVPm5MP.jpg", status: "Completed" },
+            { title: "Money Heist", seasons: [{ s: 1, m: 605 }, { s: 2, m: 417 }, { s: 3, m: 372 }, { s: 4, m: 372 }, { s: 5, m: 465 }], image: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg", status: "Completed" },
+            { title: "Never Have I Ever", seasons: [{ s: 1, m: 280 }, { s: 2, m: 280 }, { s: 3, m: 280 }, { s: 4, m: 280 }], image: "https://image.tmdb.org/t/p/w500/188.jpg", status: "Completed" },
+            { title: "Sex Education", seasons: [{ s: 1, m: 432 }, { s: 2, m: 432 }, { s: 3, m: 432 }, { s: 4, m: 432 }], image: "https://image.tmdb.org/t/p/w500/3r3.jpg", status: "Completed" },
+            { title: "So Not Worth It", seasons: [{ s: 1, m: 384 }], image: "https://image.tmdb.org/t/p/w500/hH2.jpg", status: "Completed" },
+            { title: "Squid Game", seasons: [{ s: 1, m: 495 }], image: "https://image.tmdb.org/t/p/w500/dDlE2FcE.jpg", status: "S2 Available" },
+            { title: "Dahmer", seasons: [{ s: 1, m: 500 }], image: "https://image.tmdb.org/t/p/w500/f2.jpg", status: "Limited Series" },
+            { title: "Stranger Things", seasons: [{ s: 1, m: 400 }, { s: 2, m: 450 }, { s: 3, m: 400 }, { s: 4, m: 765 }], image: "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg", status: "Waiting for S5" },
+            { title: "The Boys", seasons: [{ s: 1, m: 504 }, { s: 2, m: 504 }, { s: 3, m: 504 }, { s: 4, m: 504 }], image: "https://image.tmdb.org/t/p/w500/7Ns6tO3aYjppI5bFhyPwLOrmcZS.jpg", status: "Ongoing" },
+            { title: "The Good Doctor", seasons: [{ s: 1, m: 774 }, { s: 2, m: 774 }, { s: 3, m: 860 }, { s: 4, m: 860 }, { s: 5, m: 774 }, { s: 6, m: 946 }, { s: 7, m: 430 }], image: "https://image.tmdb.org/t/p/w500/luhKkdD80qe62fwop6sdrK98.jpg", status: "Completed" },
+            { title: "Wednesday", seasons: [{ s: 1, m: 432 }], image: "https://image.tmdb.org/t/p/w500/9J.jpg", status: "Waiting for S2" },
+            { title: "XO, Kitty", seasons: [{ s: 1, m: 300 }], image: "https://image.tmdb.org/t/p/w500/hH2.jpg", status: "Waiting for S2" },
+            { title: "You", seasons: [{ s: 1, m: 480 }, { s: 2, m: 480 }, { s: 3, m: 480 }, { s: 4, m: 480 }], image: "https://image.tmdb.org/t/p/w500/7b.jpg", status: "Waiting for S5" },
+            { title: "Young Sheldon", seasons: [{ s: 1, m: 440 }, { s: 2, m: 440 }, { s: 3, m: 420 }, { s: 4, m: 360 }, { s: 5, m: 440 }, { s: 6, m: 440 }, { s: 7, m: 280 }], image: "https://image.tmdb.org/t/p/w500/MJPErzV.jpg", status: "Completed" }
+        ];
 
-        const meta = document.createElement("div");
-        meta.className = "card-meta";
-        const h = Math.floor(showMinutes / 60);
-        const m = showMinutes % 60;
-        meta.innerHTML = `<span>${showEp} Eps</span><span>${h}h ${m}m</span>`;
+        // --- COMPONENTS ---
 
-        overlay.appendChild(tag);
-        overlay.appendChild(title);
-        overlay.appendChild(meta);
-        card.appendChild(bgDiv);
-        card.appendChild(overlay);
-        grid.appendChild(card);
-      });
+        const Background = () => {
+            const canvasRef = useRef(null);
 
-      // Update Top Stats
-      document.getElementById("total-series").textContent = totalSeries;
-      document.getElementById("total-episodes").textContent = totalEp;
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                let particles = [];
 
-      // Update Timer
-      const totalH = Math.floor(totalMinutes / 60);
-      const totalM = totalMinutes % 60;
-      document.getElementById("timer-display").textContent = `${totalH}h ${totalM}m`;
+                const resize = () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                };
 
-      const days = (totalMinutes / 60 / 24).toFixed(2);
-      document.getElementById("days-display").textContent = `${days} Days`;
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.vx = (Math.random() - 0.5) * 0.5;
+                        this.vy = (Math.random() - 0.5) * 0.5;
+                        this.size = Math.random() * 200 + 50;
+                        // Cool colors: Purple, Cyan, Deep Blue
+                        const colors = ['rgba(124, 58, 237, 0.08)', 'rgba(34, 211, 238, 0.08)', 'rgba(59, 130, 246, 0.05)'];
+                        this.color = colors[Math.floor(Math.random() * colors.length)];
+                    }
+                    update() {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        if (this.x < -this.size) this.x = width + this.size;
+                        if (this.x > width + this.size) this.x = -this.size;
+                        if (this.y < -this.size) this.y = height + this.size;
+                        if (this.y > height + this.size) this.y = -this.size;
+                    }
+                    draw() {
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fillStyle = this.color;
+                        ctx.fill();
+                    }
+                }
 
+                const init = () => {
+                    particles = [];
+                    for (let i = 0; i < 15; i++) {
+                        particles.push(new Particle());
+                    }
+                };
+
+                const animate = () => {
+                    ctx.clearRect(0, 0, width, height);
+                    particles.forEach(p => {
+                        p.update();
+                        p.draw();
+                    });
+                    requestAnimationFrame(animate);
+                };
+
+                window.addEventListener('resize', resize);
+                resize();
+                init();
+                animate();
+
+                return () => window.removeEventListener('resize', resize);
+            }, []);
+
+            return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none" />;
+        };
+
+        const StatCard = ({ label, value, sub, delay }) => (
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay }}
+                className="glass-panel p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group"
+            >
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-white"><circle cx="12" cy="12" r="10"/></svg>
+                </div>
+                <h3 className="text-slate-400 text-sm font-medium tracking-wider uppercase">{label}</h3>
+                <div>
+                    <div className="text-3xl font-bold text-white tracking-tight">{value}</div>
+                    <div className="text-xs text-slate-500 mt-1">{sub}</div>
+                </div>
+            </motion.div>
+        );
+
+        const SeriesCard = ({ data, index }) => {
+            const totalMinutes = data.seasons.reduce((acc, s) => acc + s.m, 0);
+            const hours = Math.floor(totalMinutes / 60);
+            const mins = totalMinutes % 60;
+            const seasonsCount = data.seasons.length;
+
+            return (
+                <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    transition={{ duration: 0.3 }}
+                    className="group relative rounded-2xl overflow-hidden aspect-[2/3] cursor-pointer shadow-2xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 transition-colors"
+                >
+                    {/* Image Background */}
+                    <div 
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                        style={{ backgroundImage: `url(${data.image}), url('https://placehold.co/400x600/1e293b/475569?text=${data.title}')` }}
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+
+                    {/* Content */}
+                    <div className="absolute inset-0 p-5 flex flex-col justify-end">
+                        <motion.div 
+                            initial={{ x: -10, opacity: 0 }}
+                            whileInView={{ x: 0, opacity: 1 }}
+                            className="transform transition-transform duration-300 group-hover:-translate-y-2"
+                        >
+                            <div className="flex justify-between items-end mb-1">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                                    data.status.includes("Completed") ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : 
+                                    data.status.includes("Waiting") ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : 
+                                    "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                                }`}>
+                                    {data.status}
+                                </span>
+                            </div>
+                            <h3 className="text-xl font-bold leading-tight text-white mb-1 drop-shadow-md">{data.title}</h3>
+                            <div className="flex items-center gap-3 text-xs text-slate-300 font-medium">
+                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span>{seasonsCount} Seasons</span>
+                                <span className="text-slate-500">•</span>
+                                <span>{hours}h {mins}m</span>
+                            </div>
+                        </motion.div>
+
+                        {/* Hover Details */}
+                        <div className="h-0 overflow-hidden group-hover:h-auto transition-all duration-300 ease-out opacity-0 group-hover:opacity-100">
+                             <div className="pt-3 mt-3 border-t border-white/10 flex flex-wrap gap-1">
+                                {data.seasons.map((s, i) => (
+                                    <div key={i} className="text-[9px] bg-white/5 px-1.5 py-0.5 rounded text-slate-400">
+                                        S{s.s}
+                                    </div>
+                                ))}
+                             </div>
+                        </div>
+                    </div>
+                </motion.div>
+            );
+        };
+
+        const App = () => {
+            const [searchTerm, setSearchTerm] = useState("");
+            const [filter, setFilter] = useState("All");
+
+            // Maths
+            const totalStats = useMemo(() => {
+                let minutes = 0;
+                let episodes = 0; // Rough estimate based on data if needed, but we focus on time
+                let seriesCount = RAW_DATA.length;
+
+                RAW_DATA.forEach(series => {
+                    series.seasons.forEach(s => {
+                        minutes += s.m;
+                    });
+                });
+
+                const days = (minutes / 60 / 24).toFixed(1);
+                const hours = Math.floor(minutes / 60);
+                
+                return { minutes, hours, days, seriesCount };
+            }, []);
+
+            const filteredData = useMemo(() => {
+                return RAW_DATA.filter(item => {
+                    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesFilter = filter === "All" ? true : 
+                                          filter === "Completed" ? item.status === "Completed" : 
+                                          filter === "Ongoing" ? (item.status !== "Completed") : true;
+                    return matchesSearch && matchesFilter;
+                }).sort((a, b) => a.title.localeCompare(b.title));
+            }, [searchTerm, filter]);
+
+            return (
+                <div className="min-h-screen relative p-4 md:p-8">
+                    <Background />
+                    
+                    <div className="max-w-7xl mx-auto space-y-8 relative z-10">
+                        {/* Header Section */}
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+                            <div>
+                                <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 pb-2">
+                                    WATCHLOG
+                                </h1>
+                                <p className="text-slate-400 text-lg tracking-wide">
+                                    The Archives of a Binge Watcher
+                                </p>
+                            </div>
+                            
+                            <div className="flex gap-2">
+                                {["All", "Completed", "Ongoing"].map(f => (
+                                    <button 
+                                        key={f}
+                                        onClick={() => setFilter(f)}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                            filter === f 
+                                            ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]" 
+                                            : "bg-white/5 text-slate-400 hover:bg-white/10"
+                                        }`}
+                                    >
+                                        {f}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <StatCard label="Total Series" value={totalStats.seriesCount} sub="Titles Tracked" delay={0.1} />
+                            <StatCard label="Total Hours" value={totalStats.hours.toLocaleString()} sub="Pure Watchtime" delay={0.2} />
+                            <StatCard label="Life Spent" value={`${totalStats.days} Days`} sub="Continuous" delay={0.3} />
+                            <StatCard label="Status" value="Active" sub="Jan 2026 Updated" delay={0.4} />
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg className="h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Search library..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-slate-600 backdrop-blur-sm"
+                            />
+                        </div>
+
+                        {/* Grid */}
+                        <motion.div layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            <AnimatePresence>
+                                {filteredData.map((series, idx) => (
+                                    <SeriesCard key={series.title} data={series} index={idx} />
+                                ))}
+                            </AnimatePresence>
+                        </motion.div>
+                        
+                        {filteredData.length === 0 && (
+                            <div className="text-center py-20 text-slate-500">
+                                No series found matching your criteria.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
-  </body>
+    
+    <script>
+      window.onload = function() {
+        if(window.lucide) lucide.createIcons();
+      }
+    </script>
+</body>
 </html>
